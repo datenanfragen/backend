@@ -1,0 +1,35 @@
+{
+    "name": "backend",
+    "version": "1.0.0",
+    "private": true,
+    "description": "While Datenanfragen.de is mostly run as a static site, some functionality does require a server. These endpoints are defined here.",
+    "author": "The Datenanfragen.de project <dev@datenanfragen.de> (https://www.datenanfragen.de)",
+    "license": "MIT",
+    "devDependencies": {
+        "husky": "^4.2.5",
+        "lint-staged": "^10.2.11",
+        "nodemon": "^2.0.4",
+        "prettier": "^2.0.5"
+    },
+    "dependencies": {
+        "@hapi/hapi": "^19.2.0",
+        "@hapi/inert": "^6.0.1",
+        "joi": "^17.2.0",
+        "knex": "^0.21.3",
+        "nanoid": "^3.1.12",
+        "sqlite3": "^5.0.0"
+    },
+    "scripts": {
+        "dev": "nodemon src/index.js"
+    },
+    "husky": {
+        "hooks": {
+            "pre-commit": "lint-staged"
+        }
+    },
+    "lint-staged": {
+        "*.{js,css,scss,json}": [
+            "prettier --write"
+        ]
+    }
+}

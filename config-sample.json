@@ -1,0 +1,12 @@
+{
+    "comments": {
+        "service_url": "https://server.tld/comments",
+        "smtp_host": "mail.server.tld",
+        "smtp_port": 465,
+        "smtp_secure": true,
+        "smtp_user": "johnny",
+        "smtp_password": "hunter2",
+        "token_sender": "comments@server.tld",
+        "token_recipients": "admin@server.tld, moderator@server.tld"
+    }
+}
