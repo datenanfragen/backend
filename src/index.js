@@ -13,7 +13,6 @@ const init = async () => {
                 relativeTo: path.join(__dirname, 'static'),
             },
         },
-        debug: { request: ['error'] },
     });
     // For serving static files.
     await server.register(require('@hapi/inert'));
@@ -43,7 +42,7 @@ const init = async () => {
         options: {
             validate: {
                 payload: Joi.object({
-                    for: Joi.string().required(),
+                    for: Joi.string().required().valid('cdb'),
                     new: Joi.boolean().required(),
                     data: Joi.object().required(),
                 }),

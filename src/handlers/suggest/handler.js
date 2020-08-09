@@ -18,9 +18,6 @@ ${JSON.stringify(data, null, 4)}
 async function suggest(request, h) {
     try {
         const request_body = request.payload;
-        if (request_body.for !== 'cdb') {
-            return h.response({ message: 'Unrecognized value for parameter `for`.' }).code(400);
-        }
 
         const result = await octokit.issues.create({
             owner: config.suggest.owner,
