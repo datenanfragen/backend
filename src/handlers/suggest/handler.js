@@ -9,7 +9,6 @@ const octokit = new Octokit({
 
 /**
  * Returns `JSON.stringify()`'s output for a new entry, otherwise it returns a diff by downloading the old entry from `raw.github.com`.
- * Uses `old_json` to cache the old entry.
  * @param request_body
  * @returns {Promise<string|*>}
  */
@@ -20,7 +19,7 @@ async function getMessageContent(request_body) {
     const url = `https://raw.githubusercontent.com/${config.suggest.owner}/${config.suggest.repo}/${config.suggest.branch}/companies/${request_body.data.slug}.json`;
 
     // wrap request in Promise, see https://stackoverflow.com/a/51162901
-    old_json = await new Promise((resolve, reject) => {
+    const old_json = await new Promise((resolve, reject) => {
         request({ uri: url }, function (error, response, body) {
             if (error || response.statusCode !== 200) {
                 console.error(error);
@@ -44,7 +43,6 @@ ${await getMessageContent(request_body)}
 }
 
 async function suggest(request, h) {
-    old_json = null;
     try {
         const request_body = request.payload;
 
