@@ -20,10 +20,12 @@
         "knex": "^0.21.3",
         "nanoid": "^3.1.12",
         "nodemailer": "^6.4.11",
+        "pm2": "^4.4.0",
         "sqlite3": "^5.0.0"
     },
     "scripts": {
-        "dev": "nodemon src/index.js"
+        "dev": "nodemon src/index.js",
+        "prod": "pm2 startOrRestart ecosystem.config.js --no-daemon"
     },
     "husky": {
         "hooks": {

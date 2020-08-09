@@ -14,7 +14,3 @@ TODO: This is still very much a work in progress. Neither the code nor this READ
 ### Development
 
 You can start the development server using `yarn dev`. It will reload automatically when you change something.
-
-### Production
-
-TODO: Use pm2
