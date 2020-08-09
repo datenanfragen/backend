@@ -34,6 +34,24 @@ const init = async () => {
             },
         },
     });
+    server.route({
+        method: 'GET',
+        path: '/comments/accept/{id}/{token}',
+        handler: require('./handlers/comments/acceptComment'),
+    });
+    server.route({
+        method: 'GET',
+        path: '/comments/{action}/{target}',
+        handler: require('./handlers/comments/getComments'),
+        options: {
+            validate: {
+                params: Joi.object({
+                    action: Joi.string().valid('get', 'feed').required(),
+                    target: Joi.string().required(),
+                }),
+            },
+        },
+    });
 
     server.route({
         method: 'PUT',
