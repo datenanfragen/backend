@@ -41,7 +41,7 @@ const init = async () => {
     });
     server.route({
         method: 'GET',
-        path: '/comments/{action}/{target}',
+        path: '/comments/{action}/{target*}',
         handler: require('./handlers/comments/getComments'),
         options: {
             validate: {
