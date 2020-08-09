@@ -7,8 +7,6 @@ const octokit = new Octokit({
     userAgent: 'Datenanfragen.de suggest-api',
 });
 
-let old_json = null;
-
 /**
  * Returns `JSON.stringify()`'s output for a new entry, otherwise it returns a diff by downloading the old entry from `raw.github.com`.
  * Uses `old_json` to cache the old entry.
@@ -20,19 +18,18 @@ async function getMessageContent(request_body) {
 
     // an update was suggested, lets make a diff!
     const url = `https://raw.githubusercontent.com/${config.suggest.owner}/${config.suggest.repo}/${config.suggest.branch}/companies/${request_body.data.slug}.json`;
-    if (!old_json) {
-        // wrap request in Promise, see https://stackoverflow.com/a/51162901
-        old_json = await new Promise((resolve, reject) => {
-            request({ uri: url }, function (error, response, body) {
-                if (error || response.statusCode !== 200) {
-                    console.error(error);
-                    console.error(`Responsecode: ${response.statusCode}`);
-                    reject(`Request to ${url} failed`);
-                }
-                resolve(body);
-            });
+
+    // wrap request in Promise, see https://stackoverflow.com/a/51162901
+    old_json = await new Promise((resolve, reject) => {
+        request({ uri: url }, function (error, response, body) {
+            if (error || response.statusCode !== 200) {
+                console.error(error);
+                console.error(`Responsecode: ${response.statusCode}`);
+                reject(`Request to ${url} failed`);
+            }
+            resolve(body);
         });
-    }
+    });
     return jsonDiff.diffString(JSON.parse(old_json), request_body.data, { color: '' });
 }
 
@@ -57,7 +54,10 @@ async function suggest(request, h) {
             title: request_body.new
                 ? 'New company suggestion' + (request_body.data.name ? ': `' + request_body.data.name + '`' : '')
                 : 'Suggested update for company `' + request_body.data.slug + '`',
-            body: await messageBody(request_body),
+            // we create the issue just with the raw submission as body
+            // this is overwritten later on: the issue is added as source and it becomes a diff if this was an update
+            // but in case that second step fails, we have saved the raw data
+            body: JSON.stringify(request_body.data),
         });
 
         if (result.status !== 201) {
