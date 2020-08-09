@@ -8,10 +8,12 @@ const init = async () => {
         port: 3000,
         host: 'localhost',
         routes: {
+            cors: true,
             files: {
                 relativeTo: path.join(__dirname, 'static'),
             },
         },
+        debug: { request: ['error'] },
     });
     // For serving static files.
     await server.register(require('@hapi/inert'));
@@ -23,13 +25,27 @@ const init = async () => {
         path: '/comments',
         handler: require('./handlers/comments/putComment'),
         options: {
-            cors: true,
             validate: {
                 payload: Joi.object({
                     author: Joi.string(),
                     message: Joi.string().required(),
                     target: Joi.string().required(),
                     additional: Joi.object(),
+                }),
+            },
+        },
+    });
+
+    server.route({
+        method: 'PUT',
+        path: '/suggest',
+        handler: require('./handlers/suggest/handler'),
+        options: {
+            validate: {
+                payload: Joi.object({
+                    for: Joi.string().required(),
+                    new: Joi.boolean().required(),
+                    data: Joi.object().required(),
                 }),
             },
         },
@@ -48,7 +64,7 @@ const init = async () => {
 };
 
 process.on('unhandledRejection', (err) => {
-    console.err('An unhandled promise rejection occurred:', err);
+    console.error('An unhandled promise rejection occurred:', err);
     // PM2 will auto-restart in this case.
     // TODO: We should probably be informed about this somehow.
     process.exit(1);

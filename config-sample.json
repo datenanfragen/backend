@@ -8,5 +8,10 @@
         "smtp_password": "hunter2",
         "token_sender": "comments@server.tld",
         "token_recipients": "admin@server.tld, moderator@server.tld"
+    },
+    "suggest": {
+        "owner": "datenanfragen",
+        "repo": "data",
+        "github_token": "TOKEN"
     }
 }
