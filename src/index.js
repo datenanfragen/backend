@@ -13,7 +13,6 @@ const init = async () => {
                 relativeTo: path.join(__dirname, 'static'),
             },
         },
-        debug: { request: ['error'] },
     });
     // For serving static files.
     await server.register(require('@hapi/inert'));
