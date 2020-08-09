@@ -44,7 +44,7 @@ async function sendTokenMail(comment, service_url) {
     const mailOptions = {
         from: config.comments.token_sender,
         to: config.comments.token_recipients,
-        subject: 'New comment received for Datenanfragen.de"',
+        subject: 'New comment received for Datenanfragen.de',
         text: `A new comment has been submitted.
 
 ID: "${comment.id}"
