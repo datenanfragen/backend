@@ -56,7 +56,7 @@ Comment:
 "${comment.message}"
 
 Use the following link to accept the comment:
-${service_url}/token/${comment.id}/${comment.accept_token}
+${service_url}/accept/${comment.id}/${comment.accept_token}
 
 If you don't want to accept the comment, you don't need to do anything.`,
     };

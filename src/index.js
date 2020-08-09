@@ -34,6 +34,11 @@ const init = async () => {
             },
         },
     });
+    server.route({
+        method: 'GET',
+        path: '/comments/accept/{id}/{token}',
+        handler: require('./handlers/comments/acceptComment'),
+    });
 
     server.route({
         method: 'PUT',
