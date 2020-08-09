@@ -12,6 +12,7 @@
     "suggest": {
         "owner": "datenanfragen",
         "repo": "data",
+        "branch": "master",
         "github_token": "TOKEN"
     }
 }
