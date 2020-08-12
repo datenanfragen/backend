@@ -12,16 +12,18 @@ async function suggest(request, h) {
     try {
         const request_body = request.payload;
 
-        let files = {};
-        files['companies/' + request_body.data.slug + '.json'] = JSON.stringify(request_body.data, null, 4);
+        const files = {
+            ['companies/' + request_body.data.slug + '.json']: JSON.stringify(request_body.data, null, 4) + '\n',
+        };
 
         const title = request_body.new
             ? 'New company suggestion' + (request_body.data.name ? ': `' + request_body.data.name + '`' : '')
             : 'Suggested update for company `' + request_body.data.slug + '`';
 
-        const commit_msg = request_body.new
-            ? 'added ' + (request_body.data.name ? ': `' + request_body.data.name + '`' : '')
-            : 'updated `' + request_body.data.slug + '`';
+        const commit_msg =
+            (request_body.new
+                ? 'Add ' + (request_body.data.name ? ': `' + request_body.data.name + '`' : '')
+                : 'Update `' + request_body.data.slug + '`') + ' (community contribution)';
 
         const pr = await new Promise((resolve, reject) => {
             octokit
@@ -29,12 +31,12 @@ async function suggest(request, h) {
                     owner: config.suggest.owner,
                     repo: config.suggest.repo,
                     base: config.suggest.branch,
-                    title: title,
-                    body: 'The following suggestion was submitted through the website:',
+                    title,
+                    body: 'This suggestion was submitted through the website.',
                     head: 'suggest_' + request_body.data.slug + '_' + Date.now(),
                     changes: [
                         {
-                            files: files,
+                            files,
                             commit: commit_msg,
                         },
                     ],
@@ -49,7 +51,8 @@ async function suggest(request, h) {
             .response({
                 message: 'PR created successfully.',
                 pr_number: pr.data.number,
-                pr_url: pr_url,
+                url: pr_url,
+                issue_url: pr_url, // legacy support
             })
             .code(201);
     } catch (e) {
