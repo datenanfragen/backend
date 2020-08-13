@@ -69,6 +69,44 @@ const init = async () => {
     });
 
     server.route({
+        method: 'POST',
+        path: '/donation',
+        handler: require('./handlers/donation/post'),
+        options: {
+            validate: {
+                payload: Joi.object({
+                    payment_provider: Joi.string().required().valid('coingate', 'mollie'),
+                    amount: Joi.string()
+                        .pattern(/^[0-9]+\.[0-9]{2}/)
+                        .required(),
+                    description: Joi.string(),
+                    method: Joi.optional().when('payment_provider', {
+                        is: 'mollie',
+                        then: Joi.string().valid('mollie', 'creditcard').required(),
+                    }),
+                    reference: Joi.string().required(),
+                    redirect_url: Joi.string()
+                        .required()
+                        .pattern(/^https:\/\/.*/),
+                }),
+            },
+        },
+    });
+
+    server.route({
+        method: 'GET',
+        path: '/donation/state/{reference*}',
+        handler: require('./handlers/donation/state'),
+        options: {
+            validate: {
+                params: Joi.object({
+                    reference: Joi.string().required(),
+                }),
+            },
+        },
+    });
+
+    server.route({
         method: 'GET',
         path: '/',
         handler: (request, h) => {
