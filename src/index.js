@@ -75,17 +75,13 @@ const init = async () => {
         options: {
             validate: {
                 payload: Joi.object({
-                    payment_provider: Joi.string().required().valid('coingate', 'mollie'),
+                    method: Joi.string().valid('mollie', 'creditcard', 'cryptocurrency').required(),
                     amount: Joi.string()
                         .pattern(/^[0-9]+\.[0-9]{2}/)
                         .required(),
                     description: Joi.string(),
-                    method: Joi.optional().when('payment_provider', {
-                        is: 'mollie',
-                        then: Joi.string().valid('mollie', 'creditcard').required(),
-                    }),
                     reference: Joi.string().required(),
-                    redirect_url: Joi.string()
+                    redirect_base: Joi.string()
                         .required()
                         .pattern(/^https:\/\/.*/),
                 }),
