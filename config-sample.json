@@ -14,5 +14,17 @@
         "repo": "data",
         "branch": "master",
         "github_token": "TOKEN"
+    },
+    "donation": {
+        "mollie": {
+            "api_key": "test_SECRET",
+            "endpoint": "https://api.mollie.com/v2/payments",
+            "other_methods": ["sofort", "giropay", "eps", "bancontact", "ideal", "kbc", "belfius", "inghomepay"]
+        },
+        "coingate": {
+            "api_key": "ALSO_$3Cr3t",
+            "endpoint": "https://api.coingate.com/v2/orders"
+        },
+        "currency": "EUR"
     }
 }

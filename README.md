@@ -13,4 +13,7 @@ TODO: This is still very much a work in progress. Neither the code nor this READ
 
 ### Development
 
-You can start the development server using `yarn dev`. It will reload automatically when you change something.
+You can start the development server using `yarn dev`. It will reload automatically when you change something. Testing the payment providers can be done by using their respective test APIs:
+
+* **mollie**: Use the provided test API key and the endpoint as configured in the `config-sample.json`
+* **CoinGate**: Create an account at [sandbox.coingate.com](https://sandbox.coingate.com) (you'll need a "business" or "merchant" account) and use the API endpoint for the sandbox (`https://api-sandbox.coingate.com/v2/orders`) in combination with your sandbox API key.
