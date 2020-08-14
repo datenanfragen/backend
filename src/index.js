@@ -77,13 +77,13 @@ const init = async () => {
                 payload: Joi.object({
                     method: Joi.string().valid('mollie', 'creditcard', 'cryptocurrency').required(),
                     amount: Joi.string()
-                        .pattern(/^[0-9]+\.[0-9]{2}/)
+                        .pattern(/^[0-9]+\.[0-9]{2}$/)
                         .required(),
                     description: Joi.string(),
                     reference: Joi.string().required(),
                     redirect_base: Joi.string()
                         .required()
-                        .pattern(/^https:\/\/.*/),
+                        .pattern(/^https:\/\/.+/),
                 }),
             },
         },
