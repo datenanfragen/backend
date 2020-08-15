@@ -28,7 +28,7 @@ const init = async () => {
                     time: '0 0 0 * * *',
                     timezone: 'Europe/Berlin',
                     request: {
-                        method: 'GET',
+                        method: 'POST',
                         url: '/cron/garbageCollect',
                     },
                     onComplete: (res) => {
@@ -123,7 +123,7 @@ const init = async () => {
     });
 
     server.route({
-        method: 'GET',
+        method: 'POST',
         path: '/cron/garbageCollect',
         handler: require('./handlers/cron/garbageCollect'),
     });
