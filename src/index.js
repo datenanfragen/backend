@@ -19,6 +19,26 @@ const init = async () => {
     // Expose the database to the routes.
     server.method('knex', knex);
 
+    await server.register({
+        plugin: require('hapi-cron'),
+        options: {
+            jobs: [
+                {
+                    name: 'garbage_collect',
+                    time: '0 0 0 * * *',
+                    timezone: 'Europe/Berlin',
+                    request: {
+                        method: 'GET',
+                        url: '/cron/garbageCollect',
+                    },
+                    onComplete: (res) => {
+                        console.log('cron:', res.message);
+                    },
+                },
+            ],
+        },
+    });
+
     server.route({
         method: 'PUT',
         path: '/comments',
