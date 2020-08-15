@@ -160,6 +160,11 @@
   resolved "https://registry.yarnpkg.com/@hapi/hoek/-/hoek-9.0.4.tgz#e80ad4e8e8d2adc6c77d985f698447e8628b6010"
   integrity sha512-EwaJS7RjoXUZ2cXXKZZxZqieGtc7RbvQhUy8FwDoMQtxWVi14tFjeFCYPZAM1mBCpOpiBpyaZbb9NeHc7eGKgw==
 
+"@hapi/hoek@^6.1.2":
+  version "6.2.4"
+  resolved "https://registry.yarnpkg.com/@hapi/hoek/-/hoek-6.2.4.tgz#4b95fbaccbfba90185690890bdf1a2fbbda10595"
+  integrity sha512-HOJ20Kc93DkDVvjwHyHawPwPkX44sIrbXazAUDiUXaY2R9JwQGo2PhFfnQtdrsIe4igjG2fPgMra7NYw7qhy0A==
+
 "@hapi/inert@^6.0.1":
   version "6.0.2"
   resolved "https://registry.yarnpkg.com/@hapi/inert/-/inert-6.0.2.tgz#6795bd625e14b5aa7b264b5fa706c43baba05cf3"
@@ -1166,7 +1171,7 @@ cosmiconfig@^6.0.0:
     path-type "^4.0.0"
     yaml "^1.7.2"
 
-cron@1.8.2:
+cron@1.8.2, cron@^1.7.1:
   version "1.8.2"
   resolved "https://registry.yarnpkg.com/cron/-/cron-1.8.2.tgz#4ac5e3c55ba8c163d84f3407bde94632da8370ce"
   integrity sha512-Gk2c4y6xKEO8FSAUTklqtfSr7oTq0CiPQeLBG5Fl0qoXpZyMcj1SG59YL+hqq04bu6/IuEA7lMkYDAplQNKkyg==
@@ -1861,6 +1866,14 @@ graceful-fs@^4.1.2:
   version "4.2.4"
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.4.tgz#2256bde14d3632958c465ebc96dc467ca07a29fb"
   integrity sha512-WjKPNJF79dtJAVniUlGGWHYGz2jWxT6VhN/4m1NdkbZ2nOsEF+cI1Edgql5zCRhs/VsQYRvrXctxktVXZUkixw==
+
+hapi-cron@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/hapi-cron/-/hapi-cron-1.1.0.tgz#e0dfebcbe6af9ac3a6db47a6465c6b9cd8b940be"
+  integrity sha512-u/Ng8VSsh9Y+1KHVThs39lwS2pMTU27KAYibGc2SMeX9/cNrCqWCYODOub17DJ/lTe/tSFvj4uKSOvbrk2cjIw==
+  dependencies:
+    "@hapi/hoek" "^6.1.2"
+    cron "^1.7.1"
 
 har-schema@^2.0.0:
   version "2.0.0"
