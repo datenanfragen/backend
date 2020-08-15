@@ -104,6 +104,12 @@ const init = async () => {
 
     server.route({
         method: 'GET',
+        path: '/cron/garbageCollect',
+        handler: require('./handlers/cron/garbageCollect'),
+    });
+
+    server.route({
+        method: 'GET',
         path: '/',
         handler: (request, h) => {
             return h.file('index.html');
