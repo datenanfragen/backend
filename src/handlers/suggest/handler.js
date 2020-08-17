@@ -25,34 +25,52 @@ async function suggest(request, h) {
                 ? 'Add ' + (request_body.data.name ? ': `' + request_body.data.name + '`' : '')
                 : 'Update `' + request_body.data.slug + '`') + ' (community contribution)';
 
-        const pr = await new Promise((resolve, reject) => {
-            octokit
-                .createPullRequest({
-                    owner: config.suggest.owner,
-                    repo: config.suggest.repo,
-                    base: config.suggest.branch,
-                    title,
-                    body: 'This suggestion was submitted through the website.',
-                    head: 'suggest_' + request_body.data.slug + '_' + Date.now(),
-                    changes: [
-                        {
-                            files,
-                            commit: commit_msg,
-                        },
-                    ],
-                })
-                .then((pr) => resolve(pr))
-                .catch((e) => reject(e));
-        });
+        let url;
+        let no;
 
-        const pr_url = `https://github.com/${config.suggest.owner}/${config.suggest.repo}/pull/${pr.data.number}`;
-
+        try {
+            const pr = await new Promise((resolve, reject) => {
+                octokit
+                    .createPullRequest({
+                        owner: config.suggest.owner,
+                        repo: config.suggest.repo,
+                        base: config.suggest.branch,
+                        title,
+                        body: 'This suggestion was submitted through the website.',
+                        head: 'suggest_' + request_body.data.slug + '_' + Date.now(),
+                        changes: [
+                            {
+                                files,
+                                commit: commit_msg,
+                            },
+                        ],
+                    })
+                    .then((pr) => resolve(pr))
+                    .catch((e) => reject(e));
+            });
+            url = `https://github.com/${config.suggest.owner}/${config.suggest.repo}/pull/${pr.data.number}`;
+            no = pr.data.number;
+        } catch (e) {
+            console.error('Creating a PR failed, creating issue instead...');
+            console.log(e);
+            // creating a pr failed, so lets make an issue as fallback
+            const result = await octokit.issues.create({
+                owner: config.suggest.owner,
+                repo: config.suggest.repo,
+                title: request_body.new
+                    ? 'New company suggestion' + (request_body.data.name ? ': `' + request_body.data.name + '`' : '')
+                    : 'Suggested update for company `' + request_body.data.slug + '`',
+                body: '```json\n' + JSON.stringify(request_body.data) + '\n```',
+            });
+            no = result.data.number;
+            url = `https://github.com/${config.suggest.owner}/${config.suggest.repo}/issues/${no}`;
+        }
         return h
             .response({
-                message: 'PR created successfully.',
-                pr_number: pr.data.number,
-                url: pr_url,
-                issue_url: pr_url, // legacy support
+                message: 'Successfully posted suggestion to GitHub',
+                pr_number: no,
+                url,
+                issue_url: url, // legacy support
             })
             .code(201);
     } catch (e) {
