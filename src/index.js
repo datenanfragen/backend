@@ -95,7 +95,15 @@ const init = async () => {
                 payload: Joi.object({
                     for: Joi.string().required().valid('cdb'),
                     new: Joi.boolean().required(),
-                    data: Joi.object().required(),
+                    data: Joi.object({
+                        slug: Joi.string().required(),
+                        'relevant-countries': Joi.array().items(Joi.string()).required(),
+                        name: Joi.string().required(),
+                        sources: Joi.array().items(Joi.string()).required(),
+                        address: Joi.string().required(),
+                    })
+                        .required()
+                        .unknown(),
                 }),
             },
         },
