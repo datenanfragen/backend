@@ -50,28 +50,35 @@ async function suggest(request, h) {
                     JSON.stringify(company, null, 4) + '\n', // File content
                     commit_msg
                 )
-                    .then(() => {
-                        return octokit.pulls
-                            .update({
-                                owner: config.suggest.owner,
-                                repo: config.suggest.repo,
-                                pull_number: pr.data.number,
-                                body: `This suggestion was submitted through the website.
+                    .then(() =>
+                        octokit.pulls.update({
+                            owner: config.suggest.owner,
+                            repo: config.suggest.repo,
+                            pull_number: pr.data.number,
+                            body: `This suggestion was submitted through the website.
 
 **[Edit](https://company-json.netlify.com/#!doc=${encodeURIComponent(JSON.stringify(company))})**`,
-                                maintainer_can_modify: true, // We cannot set this setting through the plugin, but because it is jus a gimmick, we can do it afterwards just as well.
+                            maintainer_can_modify: true, // We cannot set this setting through the plugin, but because it is jus a gimmick, we can do it afterwards just as well.
+                        })
+                    )
+                    .then(() =>
+                        octokit.issues.addLabels({
+                            owner: config.suggest.owner,
+                            repo: config.suggest.repo,
+                            issue_number: pr.data.number,
+                            labels: ['record', 'via-suggest-api'],
+                        })
+                    )
+                    .then(() =>
+                        h
+                            .response({
+                                message: 'Successfully posted pull request to GitHub',
+                                number: pr.data.number,
+                                url: pr.data.html_url,
+                                issue_url: pr.data.html_url, // legacy support
                             })
-                            .then(() => {
-                                return h
-                                    .response({
-                                        message: 'Successfully posted pull request to GitHub',
-                                        number: pr.data.number,
-                                        url: pr.data.html_url,
-                                        issue_url: pr.data.html_url, // legacy support
-                                    })
-                                    .code(201);
-                            });
-                    })
+                            .code(201)
+                    )
                     .catch((e) => {
                         console.error(e);
                         return h
@@ -99,22 +106,22 @@ async function suggest(request, h) {
                     title: title,
                     body:
                         '```json\n' +
-                        JSON.stringify(company) +
+                        JSON.stringify(company, null, 4) +
                         '\n```' +
                         `
 
-** [Edit](https://company-json.netlify.com/#!doc=${encodeURIComponent(JSON.stringify(company))})**`,
+**[Edit](https://company-json.netlify.com/#!doc=${encodeURIComponent(JSON.stringify(company))})**`,
                 })
-                .then((result) => {
-                    return h
+                .then((result) =>
+                    h
                         .response({
                             message: 'Successfully posted issue to GitHub',
                             number: result.data.number,
                             url: result.data.html_url,
                             issue_url: result.data.html_url, // legacy support
                         })
-                        .code(201);
-                })
+                        .code(201)
+                )
                 .catch((e) => {
                     console.error(e);
                     return h.response({ message: 'Bad Gateway. Failed to create issue.' }).code(502);
@@ -130,40 +137,41 @@ function commitStringFileToPullRequest(owner, repo, pr, path, file_content, comm
             commit_sha: pr.base.sha,
         })
         .then((commit) => {
-            return octokit.git
-                .createTree({
-                    owner,
-                    repo,
-                    base_tree: commit.data.tree.sha,
-                    tree: [
-                        {
-                            path,
-                            mode: '100644', // This just means "file" apparently.
-                            content: file_content,
-                            type: 'blob',
-                        },
-                    ],
-                })
-                .then((tree) => {
-                    return octokit.git
-                        .createCommit({
+            return (
+                octokit.git
+                    .createTree({
+                        owner,
+                        repo,
+                        base_tree: commit.data.tree.sha,
+                        tree: [
+                            {
+                                path,
+                                mode: '100644', // This just means "file" apparently.
+                                content: file_content,
+                                type: 'blob',
+                            },
+                        ],
+                    })
+                    .then((tree) =>
+                        octokit.git.createCommit({
                             owner,
                             repo,
                             message: commit_message,
                             tree: tree.data.sha,
                             parents: [commit.data.sha],
                         })
-                        .then((new_commit) => {
-                            return octokit.git.updateRef({
-                                // Force pushing is actually just updating the reference.
-                                owner,
-                                repo,
-                                ref: 'heads/' + pr.head.ref,
-                                sha: new_commit.data.sha,
-                                force: true,
-                            });
-                        });
-                });
+                    )
+                    // Force pushing is actually just updating the reference.
+                    .then((new_commit) =>
+                        octokit.git.updateRef({
+                            owner,
+                            repo,
+                            ref: 'heads/' + pr.head.ref,
+                            sha: new_commit.data.sha,
+                            force: true,
+                        })
+                    )
+            );
         });
 }
 
