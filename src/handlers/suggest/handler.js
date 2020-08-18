@@ -9,29 +9,28 @@ const octokit = new myOctokit({
 });
 
 async function suggest(request, h) {
-    const request_body = request.payload;
+    let company = request.payload.data;
 
-    const files = {
-        ['companies/' + request_body.data.slug + '.json']: JSON.stringify(request_body.data, null, 4) + '\n',
-    };
+    const file_path = 'companies/' + company.slug + '.json';
+    const files = {};
+    files[file_path] = JSON.stringify(company, null, 4) + '\n';
 
-    const title = request_body.new
-        ? 'New company suggestion' + (request_body.data.name ? ': `' + request_body.data.name + '`' : '')
-        : 'Suggested update for company `' + request_body.data.slug + '`';
-
+    const title = request.payload.new
+        ? 'New company suggestion' + (company.name ? ': `' + company.name + '`' : '')
+        : 'Suggested update for company `' + company.slug + '`';
     const commit_msg =
-        (request_body.new
-            ? 'Add ' + (request_body.data.name ? ': `' + request_body.data.name + '`' : '')
-            : 'Update `' + request_body.data.slug + '`') + ' (community contribution)';
+        (request.payload.new
+            ? 'Add ' + (company.name ? ': `' + company.name + '`' : '')
+            : 'Update `' + company.slug + '`') + ' (community contribution)';
 
-    const pr = await octokit
+    return await octokit
         .createPullRequest({
             owner: config.suggest.owner,
             repo: config.suggest.repo,
             base: config.suggest.branch,
             title,
             body: 'This suggestion was submitted through the website.',
-            head: 'suggest_' + request_body.data.slug + '_' + Date.now(),
+            head: 'suggest_' + company.slug + '_' + Date.now(),
             changes: [
                 {
                     files,
@@ -40,47 +39,132 @@ async function suggest(request, h) {
             ],
         })
         .then((pr) => {
-            if (pr) {
-                return {
-                    url: `https://github.com/${config.suggest.owner}/${config.suggest.repo}/pull/${pr.data.number}`,
-                    pr_number: pr.data.number,
-                };
+            if (pr?.data) {
+                company.sources.push(pr.data.html_url);
+
+                return commitStringFileToPullRequest(
+                    pr.data.head.user.login,
+                    config.suggest.repo,
+                    pr.data,
+                    file_path,
+                    JSON.stringify(company, null, 4) + '\n', // File content
+                    commit_msg
+                )
+                    .then(() => {
+                        return octokit.pulls
+                            .update({
+                                owner: config.suggest.owner,
+                                repo: config.suggest.repo,
+                                pull_number: pr.data.number,
+                                body: `This suggestion was submitted through the website.
+
+**[Edit](https://company-json.netlify.com/#!doc=${encodeURIComponent(JSON.stringify(company))})**`,
+                                maintainer_can_modify: true, // We cannot set this setting through the plugin, but because it is jus a gimmick, we can do it afterwards just as well.
+                            })
+                            .then(() => {
+                                return h
+                                    .response({
+                                        message: 'Successfully posted pull request to GitHub',
+                                        number: pr.data.number,
+                                        url: pr.data.html_url,
+                                        issue_url: pr.data.html_url, // legacy support
+                                    })
+                                    .code(201);
+                            });
+                    })
+                    .catch((e) => {
+                        console.error(e);
+                        return h
+                            .response({
+                                message: 'Bad Gateway. Failed to update PR.',
+                                // Let's fail gently: This might be an error, but we already have a PR, so we can return all the information for it.
+                                number: pr.data.number,
+                                url: pr.data.html_url,
+                                issue_url: pr.data.html_url,
+                            })
+                            .code(502);
+                    });
+            } else {
+                throw Error('No PR has been created');
             }
-            throw Error('No PR has been created');
         })
         .catch((e) => {
-            console.error('Creating a PR failed, creating issue instead...');
-            console.log(e);
+            console.error(e);
+            console.log('Creating a PR failed, creating issue instead...');
             // creating a pr failed, so lets make an issue as fallback
             return octokit.issues
                 .create({
                     owner: config.suggest.owner,
                     repo: config.suggest.repo,
-                    title: request_body.new
-                        ? 'New company suggestion' +
-                          (request_body.data.name ? ': `' + request_body.data.name + '`' : '')
-                        : 'Suggested update for company `' + request_body.data.slug + '`',
-                    body: '```json\n' + JSON.stringify(request_body.data) + '\n```',
+                    title: title,
+                    body:
+                        '```json\n' +
+                        JSON.stringify(company) +
+                        '\n```' +
+                        `
+
+** [Edit](https://company-json.netlify.com/#!doc=${encodeURIComponent(JSON.stringify(company))})**`,
                 })
                 .then((result) => {
-                    return {
-                        no: result.data.number,
-                        url: `https://github.com/${config.suggest.owner}/${config.suggest.repo}/issues/${no}`,
-                    };
+                    return h
+                        .response({
+                            message: 'Successfully posted issue to GitHub',
+                            number: result.data.number,
+                            url: result.data.html_url,
+                            issue_url: result.data.html_url, // legacy support
+                        })
+                        .code(201);
                 })
                 .catch((e) => {
                     console.error(e);
-                    return h.response({ message: 'Internal Server Error' }).code(500);
+                    return h.response({ message: 'Bad Gateway. Failed to create issue.' }).code(502);
                 });
         });
+}
 
-    return h
-        .response({
-            message: 'Successfully posted suggestion to GitHub',
-            ...pr,
-            issue_url: pr.url, // legacy support
+function commitStringFileToPullRequest(owner, repo, pr, path, file_content, commit_message) {
+    return octokit.git
+        .getCommit({
+            owner: owner,
+            repo: repo,
+            commit_sha: pr.base.sha,
         })
-        .code(201);
+        .then((commit) => {
+            return octokit.git
+                .createTree({
+                    owner,
+                    repo,
+                    base_tree: commit.data.tree.sha,
+                    tree: [
+                        {
+                            path,
+                            mode: '100644', // This just means "file" apparently.
+                            content: file_content,
+                            type: 'blob',
+                        },
+                    ],
+                })
+                .then((tree) => {
+                    return octokit.git
+                        .createCommit({
+                            owner,
+                            repo,
+                            message: commit_message,
+                            tree: tree.data.sha,
+                            parents: [commit.data.sha],
+                        })
+                        .then((new_commit) => {
+                            return octokit.git.updateRef({
+                                // Force pushing is actually just updating the reference.
+                                owner,
+                                repo,
+                                ref: 'heads/' + pr.head.ref,
+                                sha: new_commit.data.sha,
+                                force: true,
+                            });
+                        });
+                });
+        });
 }
 
 module.exports = suggest;
