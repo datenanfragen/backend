@@ -5,6 +5,9 @@
     "description": "While Datenanfragen.de is mostly run as a static site, some functionality does require a server. These endpoints are defined here.",
     "author": "The Datenanfragen.de project <dev@datenanfragen.de> (https://www.datenanfragen.de)",
     "license": "MIT",
+    "engines": {
+        "node": "12"
+    },
     "devDependencies": {
         "husky": "^4.2.5",
         "lint-staged": "^10.2.11",
