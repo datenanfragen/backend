@@ -10,18 +10,20 @@ const octokit = new myOctokit({
 
 async function suggest(request, h) {
     let company = request.payload.data;
+    console.log(company);
 
-    const file_path = 'companies/' + company.slug + '.json';
+    const file_path = `companies/${company.slug}.json`;
     const files = {};
     files[file_path] = JSON.stringify(company, null, 4) + '\n';
 
     const title = request.payload.new
-        ? 'New company suggestion' + (company.name ? ': `' + company.name + '`' : '')
-        : 'Suggested update for company `' + company.slug + '`';
+        ? `New company suggestion: '${company.name || company.web}'`
+        : `Suggested update for company '${company.slug}'`;
     const commit_msg =
-        (request.payload.new
-            ? 'Add ' + (company.name ? ': `' + company.name + '`' : '')
-            : 'Update `' + company.slug + '`') + ' (community contribution)';
+        (request.payload.new ? `Add '${company.name || company.web}'` : `Update '${company.slug}'`) +
+        ' (community contribution)';
+
+    return commit_msg;
 
     return await octokit
         .createPullRequest({
@@ -30,7 +32,7 @@ async function suggest(request, h) {
             base: config.suggest.branch,
             title,
             body: 'This suggestion was submitted through the website.',
-            head: 'suggest_' + company.slug + '_' + Date.now(),
+            head: `suggest_${company.slug}_${Date.now()}`,
             changes: [
                 {
                     files,
@@ -39,7 +41,8 @@ async function suggest(request, h) {
             ],
         })
         .then((pr) => {
-            if (pr?.data) {
+            if (pr && pr.data) {
+                // TODO: Replace with ?. in node 14
                 company.sources.push(pr.data.html_url);
 
                 return commitStringFileToPullRequest(
@@ -58,7 +61,7 @@ async function suggest(request, h) {
                             body: `This suggestion was submitted through the website.
 
 **[Edit](https://company-json.netlify.com/#!doc=${encodeURIComponent(JSON.stringify(company))})**`,
-                            maintainer_can_modify: true, // We cannot set this setting through the plugin, but because it is jus a gimmick, we can do it afterwards just as well.
+                            maintainer_can_modify: true, // We cannot set this setting through the plugin, but because it is just a gimmick, we can do it afterwards just as well.
                         })
                     )
                     .then(() =>
