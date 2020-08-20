@@ -1,5 +1,6 @@
 const Hapi = require('@hapi/hapi');
 const Joi = require('@hapi/joi');
+const Boom = require('@hapi/boom');
 const path = require('path');
 const knex = require('knex')(require('../knexfile').development);
 
@@ -11,6 +12,18 @@ const init = async () => {
             cors: true,
             files: {
                 relativeTo: path.join(__dirname, 'static'),
+            },
+            validate: {
+                // taken from: https://github.com/hapijs/hapi/issues/3706#issuecomment-349765943
+                failAction: async (request, h, err) => {
+                    if (process.env.NODE_ENV === 'production') {
+                        console.error('ValidationError:', err.message);
+                        throw Boom.badRequest(`Invalid request payload input`);
+                    } else {
+                        console.error(err);
+                        throw err;
+                    }
+                },
             },
         },
     });
