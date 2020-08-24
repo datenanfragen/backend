@@ -95,8 +95,40 @@ const init = async () => {
                 payload: Joi.object({
                     for: Joi.string().required().valid('cdb'),
                     new: Joi.boolean().required(),
-                    data: Joi.object().required(),
+                    data: Joi.object({
+                        slug: Joi.string().required(),
+                        'relevant-countries': Joi.array().items(Joi.string()).default(['all']),
+                        name: Joi.string(),
+                        web: Joi.string().uri({
+                            scheme: [/https?/],
+                        }),
+                        sources: Joi.array().items(Joi.string()).default([]),
+                        address: Joi.string(),
+                    })
+                        .required()
+                        .unknown()
+                        .or('name', 'web'),
                 }),
+                failAction: async (request, h, err) => {
+                    if (
+                        err.details[0].type === 'object.missing' &&
+                        err.details[0].context.peersWithLabels.includes('name')
+                    ) {
+                        throw Boom.badRequest(`NameOrWebMissing: You need to provide either a name or web attribute.`, {
+                            translation_string: 'name-or-web-missing',
+                        });
+                    } else if (process.env.NODE_ENV === 'production') {
+                        console.error('ValidationError:', err.message);
+                        throw err.details[0].context.key === 'data'
+                            ? Boom.badRequest(`Invalid database entry.`, {
+                                  translation_string: 'invalid-database-entry',
+                              })
+                            : Boom.badRequest(`Invalid request payload input`);
+                    } else {
+                        console.error(err);
+                        throw err;
+                    }
+                },
             },
         },
     });
