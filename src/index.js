@@ -99,7 +99,9 @@ const init = async () => {
                         slug: Joi.string().required(),
                         'relevant-countries': Joi.array().items(Joi.string()).default(['all']),
                         name: Joi.string(),
-                        web: Joi.string().domain(),
+                        web: Joi.string().uri({
+                            scheme: [/https?/],
+                        }),
                         sources: Joi.array().items(Joi.string()).default([]),
                         address: Joi.string(),
                     })

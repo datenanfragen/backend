@@ -22,8 +22,6 @@ async function suggest(request, h) {
         (request.payload.new ? `Add '${company.name || company.web}'` : `Update '${company.slug}'`) +
         ' (community contribution)';
 
-    return commit_msg;
-
     return await octokit
         .createPullRequest({
             owner: config.suggest.owner,
