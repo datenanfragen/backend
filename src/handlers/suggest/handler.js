@@ -10,7 +10,6 @@ const octokit = new myOctokit({
 
 async function suggest(request, h) {
     let company = request.payload.data;
-    console.log(company);
 
     const file_path = `companies/${company.slug}.json`;
     const files = {};
