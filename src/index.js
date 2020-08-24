@@ -113,13 +113,13 @@ const init = async () => {
                         err.details[0].context.peersWithLabels.includes('name')
                     ) {
                         throw Boom.badRequest(`NameOrWebMissing: You need to provide either a name or web attribute.`, {
-                            translation_string: 'name-wor-web-missing',
+                            translation_string: 'name-or-web-missing',
                         });
                     } else if (process.env.NODE_ENV === 'production') {
                         console.error('ValidationError:', err.message);
                         throw err.details[0].context.key === 'data'
                             ? Boom.badRequest(`Invalid database entry.`, {
-                                  translation_string: 'invalid-databse-entry',
+                                  translation_string: 'invalid-database-entry',
                               })
                             : Boom.badRequest(`Invalid request payload input`);
                     } else {
