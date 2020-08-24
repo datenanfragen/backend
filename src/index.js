@@ -111,22 +111,24 @@ const init = async () => {
                 }),
                 failAction: async (request, h, err) => {
                     if (
-                        err.details[0].type === 'object.missing' &&
-                        err.details[0].context.peersWithLabels.includes('name')
+                        (err.details[0].type === 'object.missing' &&
+                            err.details[0].context.peersWithLabels.includes('name')) ||
+                        err.details[0].context.key === 'slug'
                     ) {
-                        throw Boom.badRequest(`NameOrWebMissing: You need to provide either a name or web attribute.`, {
-                            translation_string: 'name-or-web-missing',
-                        });
-                    } else if (process.env.NODE_ENV === 'production') {
-                        console.error('ValidationError:', err.message);
-                        throw err.details[0].context.key === 'data'
-                            ? Boom.badRequest(`Invalid database entry.`, {
-                                  translation_string: 'invalid-database-entry',
-                              })
-                            : Boom.badRequest(`Invalid request payload input`);
+                        const error = Boom.badRequest(
+                            `NameOrWebMissing: You need to provide either a name or web attribute.`
+                        );
+                        error.output.payload.path = err.details[0].path;
+                        throw error;
                     } else {
-                        console.error(err);
-                        throw err;
+                        console.error('ValidationError:', err.message);
+                        const error = err.details[0].path.includes('data')
+                            ? Boom.badRequest(`Invalid database entry.`)
+                            : Boom.badRequest(`Invalid request payload input`);
+                        if (err.details[0].path[0] === 'data') {
+                            error.output.payload.path = err.details[0].path;
+                        }
+                        throw error;
                     }
                 },
             },
