@@ -15,10 +15,7 @@ async function suggest(request, h) {
     const files = {};
     files[file_path] = JSON.stringify(company, null, 4) + '\n';
 
-    const title = request.payload.new
-        ? `New company suggestion: '${company.name || company.web}'`
-        : `Suggested update for company '${company.slug}'`;
-    const commit_msg =
+    const title =
         (request.payload.new ? `Add '${company.name || company.web}'` : `Update '${company.slug}'`) +
         ' (community contribution)';
 
@@ -33,7 +30,7 @@ async function suggest(request, h) {
             changes: [
                 {
                     files,
-                    commit: commit_msg,
+                    commit: title,
                 },
             ],
         })
@@ -48,7 +45,7 @@ async function suggest(request, h) {
                     pr.data,
                     file_path,
                     JSON.stringify(company, null, 4) + '\n', // File content
-                    commit_msg
+                    title
                 )
                     .then(() =>
                         octokit.pulls.update({
