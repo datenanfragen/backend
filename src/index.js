@@ -171,6 +171,33 @@ const init = async () => {
 
     server.route({
         method: 'POST',
+        path: '/hacktoberfest',
+        handler: require('./handlers/hacktoberfest/register'),
+        options: {
+            validate: {
+                payload: Joi.object({
+                    github_user: Joi.string()
+                        // Taken from: https://github.com/shinnn/github-username-regex/blob/0794566cc10e8c5a0e562823f8f8e99fa044e5f4/index.js#L1
+                        .pattern(/^@?[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i)
+                        .required(),
+                    email: Joi.string().email().required(),
+                    accept_terms: Joi.string().allow('on').required(),
+                    accept_us_transfers: Joi.string().allow('on').required(),
+                    language: Joi.string().allow('de', 'en').required(),
+                    year: Joi.string().allow('2020').required(),
+                }),
+                failAction: async (request, h, err) => {
+                    const redirect_domain = request.payload.language === 'de' ? 'datenanfragen.de' : 'datarequests.org';
+                    return h
+                        .redirect(`https://www.${redirect_domain}/blog/hacktoberfest-2020#!error=validation`)
+                        .takeover();
+                },
+            },
+        },
+    });
+
+    server.route({
+        method: 'POST',
         path: '/cron/garbageCollect',
         handler: require('./handlers/cron/garbageCollect'),
     });
