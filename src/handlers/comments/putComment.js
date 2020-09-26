@@ -33,12 +33,12 @@ async function putComment(request, h) {
 
 async function sendTokenMail(comment, service_url) {
     const transporter = nodemailer.createTransport({
-        host: config.comments.smtp_host,
-        port: config.comments.smtp_port,
-        secure: !!config.comments.smtp_secure,
+        host: config.email.smtp_host,
+        port: config.email.smtp_port,
+        secure: !!config.email.smtp_secure,
         auth: {
-            user: config.comments.smtp_user,
-            pass: config.comments.smtp_password,
+            user: config.email.smtp_user,
+            pass: config.email.smtp_password,
         },
     });
     const mailOptions = {
