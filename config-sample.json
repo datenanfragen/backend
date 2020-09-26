@@ -31,5 +31,9 @@
         },
         "currency": "EUR",
         "retention_days": 14
+    },
+    "hacktoberfest": {
+        "sender": "Datenanfragen.de Hacktoberfest <noreply@mail.datenanfragen.de>",
+        "reply_to_email": "hacktoberfest@datenanfragen.de"
     }
 }

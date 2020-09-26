@@ -15,6 +15,8 @@ async function garbageCollect(request, h) {
 
         await request.server.methods.knex('mollie_ids').where('added_at', '<', donationLifetime.toISOString()).del();
 
+        await request.server.methods.knex('hacktoberfest').where('year', '<', new Date().getFullYear()).del();
+
         return {
             message: 'Garbage collection completed sucessfully.',
         };
