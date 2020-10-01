@@ -17,3 +17,13 @@ You can start the development server using `yarn dev`. It will reload automatica
 
 * **mollie**: Use the provided test API key and the endpoint as configured in the `config-sample.json`
 * **CoinGate**: Create an account at [sandbox.coingate.com](https://sandbox.coingate.com) (you'll need a "business" or "merchant" account) and use the API endpoint for the sandbox (`https://api-sandbox.coingate.com/v2/orders`) in combination with your sandbox API key.
+
+## Contributing
+
+First of all, thank you very much for taking the time to contribute! Contributions are incredibly valuable for a project like ours.
+
+We warmly welcome issues and pull requests through GitHub.
+
+Please be aware that by contributing, you agree for your work to be released under the MIT license, as specified in the `LICENSE` file.
+
+If you are interested in contributing in other ways besides coding, we can also really use your help. Have a look at our [contribute page](https://www.datarequests.org/contribute) for more details.
