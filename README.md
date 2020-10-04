@@ -1,19 +1,18 @@
-# The backend for Datenanfragen.de
+＃Datenanfragen.deのバックエンド
 
-> While Datenanfragen.de is mostly run as a static site, some functionality does require a server. These endpoints are defined here.
+> Datenanfragen.deはほとんど静的サイトとして実行されますが、一部の機能にはサーバーが必要です。 これらのエンドポイントはここで定義されます。
 
-TODO: This is still very much a work in progress. Neither the code nor this README is done yet.
+TODO：これはまだ非常に進行中の作業です。 コードもこのREADMEもまだ完了していません。
 
-## Setup
+＃＃ セットアップ
 
-* Clone the repo.
-* Fetch the required dependencies: `yarn`
-* Copy `config-sample.json` to `config.json` and change the settings accordingly.
-* Initialize the database: `yarn knex migrate:latest`
-
+*リポジトリのクローンを作成します。
+*必要な依存関係を取得します： `yarn`
+* `config-sample.json`を` config.json`にコピーし、それに応じて設定を変更します。
+*データベースを初期化します： `yarn knexmigrate：latest`
 ### Development
 
-You can start the development server using `yarn dev`. It will reload automatically when you change something. Testing the payment providers can be done by using their respective test APIs:
+`yarndev`を使用して開発サーバーを起動できます。 何かを変更すると自動的にリロードされます。 支払いプロバイダーのテストは、それぞれのテストAPIを使用して実行できます。
 
-* **mollie**: Use the provided test API key and the endpoint as configured in the `config-sample.json`
-* **CoinGate**: Create an account at [sandbox.coingate.com](https://sandbox.coingate.com) (you'll need a "business" or "merchant" account) and use the API endpoint for the sandbox (`https://api-sandbox.coingate.com/v2/orders`) in combination with your sandbox API key.
+* ** mollie **：提供されたテストAPIキーと、 `config-sample.json`で構成されたエンドポイントを使用します
+* ** CoinGate **：[sandbox.coingate.com]（https://sandbox.coingate.com）でアカウントを作成し（「ビジネス」または「マーチャント」アカウントが必要です）、次のAPIエンドポイントを使用します サンドボックス（ `https：// api-sandbox.coingate.com / v2 / orders`）とサンドボックスAPIキーの組み合わせ。
