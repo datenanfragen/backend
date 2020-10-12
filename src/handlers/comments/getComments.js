@@ -7,6 +7,17 @@ async function getComments(request, h) {
             is_accepted: true,
         })
         .then((data) => {
+            return data.map((item) => {
+                try {
+                    item.additional = JSON.parse(item.additional);
+                } catch (_) {
+                    item.additional = '{}';
+                }
+
+                return item;
+            });
+        })
+        .then((data) => {
             switch (request.params.action) {
                 case 'get':
                     return data;
