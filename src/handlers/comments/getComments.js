@@ -6,17 +6,17 @@ async function getComments(request, h) {
             target: request.params.target,
             is_accepted: true,
         })
-        .then((data) => {
-            return data.map((item) => {
+        .then((data) =>
+            data.map((item) => {
                 try {
                     item.additional = JSON.parse(item.additional);
                 } catch (_) {
-                    item.additional = '{}';
+                    item.additional = {};
                 }
 
                 return item;
-            });
-        })
+            })
+        )
         .then((data) => {
             switch (request.params.action) {
                 case 'get':
