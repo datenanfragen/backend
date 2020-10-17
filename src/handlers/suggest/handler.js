@@ -16,7 +16,7 @@ async function suggest(request, h) {
     files[file_path] = JSON.stringify(company, null, 4) + '\n';
 
     const title =
-        (request.payload.new ? `Add '${company.name || company.web}'` : `Update '${company.slug}'`) +
+        (request.payload.new ? `Add '${company.name || company.web}'` : `Update '${company.name || company.slug}'`) +
         ' (community contribution)';
 
     return await octokit
