@@ -52,23 +52,27 @@ async function main() {
 
     const participants = await knex('hacktoberfest').select().where({ year });
     for (const participant of participants) {
-        const res = await octokit.search.issuesAndPullRequests({
-            q: `type:pr author:${participant.github_user} created:${year}-10-01..${year}-11-01 ${REPO_QUERY}`,
-        });
-        if (res.data.incomplete_results !== false) {
-            console.error('Incomplete results!');
-            process.exit(1);
-        }
-
-        const prs = res.data.items;
-        const eligible_prs = prs.filter((p) => !p.labels.includes('invalid'));
-
-        await knex('hacktoberfest')
-            .where({ github_user: participant.github_user })
-            .update({
-                pr_urls: eligible_prs.map((p) => p.html_url).join(', '),
-                completed_challenge: eligible_prs.length > 0,
+        try {
+            const res = await octokit.search.issuesAndPullRequests({
+                q: `type:pr author:${participant.github_user} created:${year}-10-01..${year}-11-01 ${REPO_QUERY}`,
             });
+            if (res.data.incomplete_results !== false) {
+                console.error('Incomplete results!');
+                process.exit(1);
+            }
+
+            const prs = res.data.items;
+            const eligible_prs = prs.filter((p) => !p.labels.includes('invalid'));
+
+            await knex('hacktoberfest')
+                .where({ github_user: participant.github_user })
+                .update({
+                    pr_urls: eligible_prs.map((p) => p.html_url).join(', '),
+                    completed_challenge: eligible_prs.length > 0,
+                });
+        } catch (err) {
+            console.error('Processing user', participant.github_user, 'failed:', err);
+        }
     }
     console.log('Done.');
 }
