@@ -16,6 +16,15 @@ async function garbageCollect(request, h) {
         await request.server.methods.knex('mollie_ids').where('added_at', '<', donationLifetime.toISOString()).del();
 
         await request.server.methods.knex('hacktoberfest').where('year', '<', new Date().getFullYear()).del();
+        await request.server.methods.knex('hacktoberfest').where({ sent: true }).update({ address: '<deleted>' });
+        if (new Date().toISOString() > `${new Date().getFullYear()}-11-30`) {
+            await request.server.methods
+                .knex('hacktoberfest')
+                .whereRaw(
+                    'not completed_challenge and (not completed_challenge_override or completed_challenge_override is null)'
+                )
+                .del();
+        }
 
         return {
             message: 'Garbage collection completed sucessfully.',

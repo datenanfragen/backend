@@ -34,6 +34,7 @@
     },
     "hacktoberfest": {
         "sender": "Datenanfragen.de Hacktoberfest <noreply@mail.datenanfragen.de>",
-        "reply_to_email": "hacktoberfest@datenanfragen.de"
+        "reply_to_email": "hacktoberfest@datenanfragen.de",
+        "github_token": "TOKEN"
     }
 }
