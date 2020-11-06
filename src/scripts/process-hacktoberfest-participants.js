@@ -62,7 +62,7 @@ async function main() {
             }
 
             const prs = res.data.items;
-            const eligible_prs = prs.filter((p) => !p.labels.includes('invalid'));
+            const eligible_prs = prs.filter((p) => !p.labels.find((l) => l.name === 'invalid'));
 
             await knex('hacktoberfest')
                 .where({ github_user: participant.github_user })
