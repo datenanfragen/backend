@@ -17,6 +17,8 @@
     "dependencies": {
         "@hapi/hapi": "^19.2.0",
         "@hapi/inert": "^6.0.1",
+        "@octokit/plugin-retry": "^3.0.4",
+        "@octokit/plugin-throttling": "^3.3.3",
         "@octokit/rest": "^18.0.3",
         "axios": "^0.19.2",
         "hapi-cron": "^1.1.0",
