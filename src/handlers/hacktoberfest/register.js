@@ -1,5 +1,6 @@
 const nodemailer = require('nodemailer');
 const config = require('../../../config.json');
+const { nanoid } = require('nanoid');
 
 const I18N = {
     de: {
@@ -59,6 +60,7 @@ async function register(request, h) {
         language: request.payload.language,
         year: request.payload.year,
         added_at: new Date().toISOString(),
+        token: nanoid(),
     };
 
     return await request.server.methods
@@ -80,6 +82,7 @@ async function register(request, h) {
 }
 
 async function sendConfirmationMail(github_user, email, language, year) {
+    // TODO: Migrate to import from `util/mail.js`.
     const transporter = nodemailer.createTransport({
         host: config.email.smtp_host,
         port: config.email.smtp_port,

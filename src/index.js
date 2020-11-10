@@ -3,6 +3,8 @@ const Joi = require('@hapi/joi');
 const Boom = require('@hapi/boom');
 const path = require('path');
 const knex = require('knex')(require('../knexfile').development);
+const joi_validators = require('./util/joi');
+const joi = require('./util/joi');
 
 const init = async () => {
     const server = Hapi.server({
@@ -29,6 +31,8 @@ const init = async () => {
     });
     // For serving static files.
     await server.register(require('@hapi/inert'));
+    // For template rendering support.
+    await server.register(require('@hapi/vision'));
     // Expose the database to the routes.
     server.method('knex', knex);
 
@@ -50,6 +54,14 @@ const init = async () => {
                 },
             ],
         },
+    });
+
+    server.views({
+        engines: { html: require('handlebars') },
+        layout: true,
+        relativeTo: __dirname,
+        path: 'templates',
+        layoutPath: 'templates/layout',
     });
 
     server.route({
@@ -176,15 +188,12 @@ const init = async () => {
         options: {
             validate: {
                 payload: Joi.object({
-                    github_user: Joi.string()
-                        // Taken from: https://github.com/shinnn/github-username-regex/blob/0794566cc10e8c5a0e562823f8f8e99fa044e5f4/index.js#L1
-                        .pattern(/^@?[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i)
-                        .required(),
+                    github_user: joi_validators.github_user.required(),
                     email: Joi.string().email().required(),
-                    accept_terms: Joi.string().allow('on').required(),
-                    accept_us_transfers: Joi.string().allow('on').required(),
-                    language: Joi.string().allow('de', 'en').required(),
-                    year: Joi.string().allow('2020').required(),
+                    accept_terms: Joi.string().valid('on').required(),
+                    accept_us_transfers: Joi.string().valid('on').required(),
+                    language: Joi.string().valid('de', 'en').required(),
+                    year: Joi.string().valid('2020').required(),
                 }),
                 failAction: async (request, h, err) => {
                     const redirect_domain = request.payload.language === 'de' ? 'datenanfragen.de' : 'datarequests.org';
@@ -192,6 +201,78 @@ const init = async () => {
                         .redirect(`https://www.${redirect_domain}/blog/hacktoberfest-2020#!error=validation`)
                         .takeover();
                 },
+            },
+        },
+    });
+    server.route({
+        method: 'GET',
+        path: '/hacktoberfest/address/{github_user}/{token}',
+        handler: require('./handlers/hacktoberfest/submit-address').submitAddressForm,
+        options: {
+            validate: {
+                params: Joi.object({
+                    github_user: joi_validators.github_user.required(),
+                    token: joi_validators.nanoid.required(),
+                }),
+            },
+        },
+    });
+    server.route({
+        method: 'POST',
+        path: '/hacktoberfest/address',
+        handler: require('./handlers/hacktoberfest/submit-address').submitAddress,
+        options: {
+            validate: {
+                payload: Joi.object({
+                    // prettier-ignore
+                    size: Joi.string()
+                        .valid('men-s', 'men-m', 'men-l', 'men-xl', 'men-2xl', 'men-3xl', 'women-xs', 'women-s', 'women-m', 'women-l', 'women-xl', 'women-2xl', 'kids-104', 'kids-116', 'kids-128', 'kids-140', 'kids-152', 'kids-164'),
+
+                    name: joi_validators.post_string.max(30).required(),
+                    additional1: joi_validators.post_string.max(40).allow(''),
+                    additional2: joi_validators.post_string.max(40).allow(''),
+                    street: joi_validators.post_string.max(40).required(),
+                    zip: joi_validators.post_string.max(20).required(),
+                    city: joi_validators.post_string.max(30).required(),
+                    additional3: joi_validators.post_string.max(20).allow(''),
+                    country: joi_validators.alpha2_country.required(),
+
+                    phone: Joi.string()
+                        .pattern(/^[0-9 +]+$/)
+                        .max(15)
+                        .allow(''),
+                    email: Joi.string().email().max(50).allow(''),
+
+                    github_user: joi_validators.github_user.required(),
+                    token: joi_validators.nanoid.required(),
+                    language: Joi.string().valid('de', 'en').required(),
+                }),
+            },
+        },
+    });
+    server.route({
+        method: 'GET',
+        path: '/hacktoberfest/address/{language}/success',
+        handler: require('./handlers/hacktoberfest/submit-address').confirmation,
+        options: {
+            validate: {
+                params: Joi.object({
+                    language: Joi.string().valid('de', 'en').required(),
+                }),
+            },
+        },
+    });
+    server.route({
+        method: 'GET',
+        path: '/hacktoberfest/send/{github_user}/{token}/{admin_token}',
+        handler: require('./handlers/hacktoberfest/submit-address').markSent,
+        options: {
+            validate: {
+                params: Joi.object({
+                    github_user: joi_validators.github_user.required(),
+                    token: joi_validators.nanoid.required(),
+                    admin_token: joi_validators.nanoid.required(),
+                }),
             },
         },
     });
@@ -204,9 +285,13 @@ const init = async () => {
 
     server.route({
         method: 'GET',
-        path: '/',
-        handler: (request, h) => {
-            return h.file('index.html');
+        path: '/{param*}',
+        handler: {
+            directory: {
+                path: '.',
+                redirectToSlash: true,
+                index: true,
+            },
         },
     });
 

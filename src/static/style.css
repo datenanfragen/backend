@@ -1,0 +1,160 @@
+body {
+    margin: 40px auto;
+    width: 80vw;
+    max-width: 800px;
+    line-height: 1.6;
+    font-size: 18px;
+    font-family: 'Fira Sans', sans-serif;
+    color: #2d3748;
+    background-color: #f7fafc;
+    padding: 0 10px;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    line-height: 1.2;
+}
+
+h1 {
+    font-size: 2em;
+    margin-bottom: 1em;
+}
+
+h2 {
+    font-size: 1.5em;
+}
+
+h3 {
+    font-size: 1.2em;
+}
+
+a,
+a:visited {
+    transition: all 0.3s ease;
+    position: relative;
+    color: #00826c;
+    text-decoration: none;
+    background-image: linear-gradient(0deg, #00826c, #00826c);
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    background-size: 100% 2px;
+}
+
+a:hover,
+a:active {
+    color: #fff;
+    background-size: 100% 100%;
+}
+
+header {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+}
+
+.clearfix {
+    clear: both;
+}
+
+.col40 {
+    width: 40%;
+    flex: 0.4;
+    float: left;
+}
+.col60 {
+    width: 60%;
+    flex: 0.6;
+    float: left;
+}
+
+/* TODO: Figure out an elegant way to share this code with website. */
+.button {
+    padding: 11px 24px;
+    border: 2px solid #214192;
+    border-radius: 2px;
+    box-sizing: border-box;
+    text-decoration: none;
+    cursor: pointer;
+    appearance: none;
+    background-color: #f7fafc;
+    color: #214192;
+    display: inline-block;
+    line-height: 1.2;
+}
+.button:hover,
+.button:focus {
+    background-color: #192a4a;
+    color: #edf2f7 !important;
+    border: 2px solid #192a4a;
+}
+.button-primary,
+a.button-primary {
+    background-color: #214192;
+    color: #f7fafc !important;
+}
+
+.form-group {
+    position: relative;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+input,
+select {
+    border: 2px solid #214192;
+    border-radius: 2px;
+    padding: 7px;
+    box-sizing: border-box;
+    appearance: none;
+    color: #214192;
+    background-color: #f7fafc;
+    font-size: 14px;
+    cursor: auto;
+}
+input.form-element,
+select.form-element {
+    width: 100%;
+}
+input:required,
+select:required {
+    background: #f7fafc
+        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='9px' width='15px'><text x='0' y='16' fill='%2300826c' font-size='20' font-family='Fira Sans'>*</text></svg>")
+        no-repeat right;
+    padding-right: 20px;
+    box-shadow: none !important;
+}
+select:required {
+    background-position-x: right 30px;
+}
+.select-container {
+    position: relative;
+}
+.select-container select {
+    appearance: none;
+    padding-right: 30px;
+    width: 100%;
+    background-color: transparent;
+}
+.select-container .icon {
+    /* Icon by Heroicons (https://heroicons.com/), Copyright (c) 2020 Refactoring UI Inc. (MIT license: https://github.com/tailwindlabs/heroicons/blob/master/LICENSE) */
+    background: #f7fafc
+        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%23214192'><path fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd' /></svg>")
+        no-repeat right;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    right: 3px;
+    top: 1px;
+    color: #214192;
+    z-index: -1;
+}
+
+.box {
+    box-sizing: border-box;
+    border: 4px solid #214192;
+    border-radius: 2px;
+    padding: 20px;
+}

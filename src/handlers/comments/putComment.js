@@ -32,6 +32,7 @@ async function putComment(request, h) {
 }
 
 async function sendTokenMail(comment, service_url) {
+    // TODO: Migrate to import from `util/mail.js`.
     const transporter = nodemailer.createTransport({
         host: config.email.smtp_host,
         port: config.email.smtp_port,
