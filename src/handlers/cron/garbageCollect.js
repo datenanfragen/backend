@@ -16,7 +16,10 @@ async function garbageCollect(request, h) {
         await request.server.methods.knex('mollie_ids').where('added_at', '<', donationLifetime.toISOString()).del();
 
         await request.server.methods.knex('hacktoberfest').where('year', '<', new Date().getFullYear()).del();
-        await request.server.methods.knex('hacktoberfest').where({ sent: true }).update({ address: '<deleted>' });
+        await request.server.methods
+            .knex('hacktoberfest')
+            .whereNotNull('swag_sent')
+            .update({ address: '<deleted>', tshirt_size: '<deleted>' });
         if (new Date().toISOString() > `${new Date().getFullYear()}-11-30`) {
             await request.server.methods
                 .knex('hacktoberfest')

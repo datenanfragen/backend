@@ -1,0 +1,300 @@
+<h1>{{title}}</h1>
+
+<p>Hallo {{user.github_user}},</p>
+
+<p>Du hast erfolgreich bei der Hacktoberfest-Aktion des Datenanfragen.de e.&nbsp;V. teilgenommen{{#if user.gets_tshirt}}. Deine Pull-Requests haben uns besonders gut gefallen, von daher bekommst Du neben dem Sticker-Set auch ein T-Shirt von uns{{else}} und bekommst daher ein Sticker-Set von uns geschenkt{{/if}}.</p>
+
+<p>Damit wir Dir Deine Preise zuschicken können, gib bitte hier Deine Adresse{{#if user.gets_tshirt}} und T-Shirt-Größe{{/if}} an. Diese Daten heben wir natürlich nur so lange wie nötig auf. Sobald wir Deine Preise verschickt haben, löschen wir diese Daten umgehend wieder. Das kannst Du auch noch einmal in den <a href="https://static.dacdn.de/docs/bedingungen-hacktoberfest-{{user.year}}.pdf">Teilnahme- und Datenschutzbedingungen für diese Aktion</a>, denen Du bei der Anmeldung zugestimmt hast, nachlesen.</p>
+
+<div class="box form-group" style="max-width: 650px; margin: auto">
+    <form action="/hacktoberfest/address" method="post">
+        {{#if user.gets_tshirt}}
+        <p>Bitte gib die Größe an, in der Du Dein T-Shirt erhalten möchtest. Zur Referenz kannst Du Dir die <a href="https://www.fruitoftheloom.eu/size-guide/?lang=de">T-Shirt-Größen-Übersicht</a> anschauen.</p>
+        <div class="col40"><strong><label for="size">T-Shirt-Größe</label></strong></div>
+        <div class="col60">
+            <div class="select-container">
+                <select id="size" name="size" class="form-element" required>
+                    <option value disabled selected hidden></option>
+                    <optgroup label="Herren">
+                        <option value="men-s">Herren S</option>
+                        <option value="men-m">Herren M</option>
+                        <option value="men-l">Herren L</option>
+                        <option value="men-xl">Herren XL</option>
+                        <option value="men-2xl">Herren 2XL</option>
+                        <option value="men-3xl">Herren 3XL</option>
+                    </optgroup>
+                    <optgroup label="Damen">
+                        <option value="women-xs">Damen XS</option>
+                        <option value="women-s">Damen S</option>
+                        <option value="women-m">Damen M</option>
+                        <option value="women-l">Damen L</option>
+                        <option value="women-xl">Damen XL</option>
+                        <option value="women-2xl">Damen 2XL</option>
+                    </optgroup>
+                    <optgroup label="Kinder">
+                        <option value="kids-104">Kinder 104 (3 – 4)</option>
+                        <option value="kids-116">Kinder 116 (5 – 6)</option>
+                        <option value="kids-128">Kinder 128 (7 – 8)</option>
+                        <option value="kids-140">Kinder 140 (9 – 11)</option>
+                        <option value="kids-152">Kinder 152 (12 – 13)</option>
+                        <option value="kids-164">Kinder 164 (14 – 15)</option>
+                    </optgroup>
+                </select>
+                <div class="icon icon-arrow-down"></div>
+            </div>
+        </div>
+        <div class="clearfix" style="margin-bottom: 50px"></div>
+        {{/if}}
+
+        <p>Gib Deine Adresse hier bitte im Format für den internationalen Versand ein und verwende nur die vorgegebenen Felder. Du darfst nur lateinische Buchstaben, Ziffern und die folgenden Zeichen benutzen: <code>äöüÄÖÜß .,;-/()+</code>. Diese Beschränkungen sind uns leider so durch die Deutsche Post vorgegeben. Falls für die Zustellung in Dein Land andere Schriftzeichen nötig sind, schicke uns bitte zusätzlich zu diesem Formular noch eine <a href="mailto:hacktoberfest@datenanfragen.de">E-Mail</a>.</p>
+        <div class="col40"><strong><label for="name">Name</label></strong></div>
+        <div class="col60"><input type="text" pattern="^[A-Za-z0-9äöüÄÖÜß.,;\-/()+ ]+$" maxlength="30" id="name" name="name" class="form-element" required></div>
+        <div class="clearfix" style="margin-bottom: 5px"></div>
+
+        <div class="col40"><strong><label for="additional1">Adresszusatz 1</label></strong> (z. B. c/o)</div>
+        <div class="col60"><input type="text" pattern="^[A-Za-z0-9äöüÄÖÜß.,;\-/()+ ]+$" maxlength="40" id="additional1" name="additional1" class="form-element"></div>
+        <div class="clearfix" style="margin-bottom: 5px"></div>
+
+        <div class="col40"><strong><label for="additional2">Adresszusatz 2</label></strong> (z. B. 3. Stock)</div>
+        <div class="col60"><input type="text" pattern="^[A-Za-z0-9äöüÄÖÜß.,;\-/()+ ]+$" maxlength="40" id="additional2" name="additional2" class="form-element"></div>
+        <div class="clearfix" style="margin-bottom: 5px"></div>
+
+        <div class="col40"><strong><label for="street">Straße und Nr.</label></strong></div>
+        <div class="col60"><input type="text" pattern="^[A-Za-z0-9äöüÄÖÜß.,;\-/()+ ]+$" maxlength="40" id="street" name="street" class="form-element" required></div>
+        <div class="clearfix" style="margin-bottom: 5px"></div>
+
+        <div class="col40"><strong><label for="zip">Postleitzahl</label></strong></div>
+        <div class="col60"><input type="text" pattern="^[A-Za-z0-9äöüÄÖÜß.,;\-/()+ ]+$" maxlength="20" id="zip" name="zip" class="form-element" required></div>
+        <div class="clearfix" style="margin-bottom: 5px"></div>
+
+        <div class="col40"><strong><label for="city">Ort</label></strong></div>
+        <div class="col60"><input type="text" pattern="^[A-Za-z0-9äöüÄÖÜß.,;\-/()+ ]+$" maxlength="30" id="city" name="city" class="form-element" required></div>
+        <div class="clearfix" style="margin-bottom: 5px"></div>
+
+        <div class="col40"><strong><label for="additional3">Zusätzliche Ortsangaben</label></strong></div>
+        <div class="col60"><input type="text" pattern="^[A-Za-z0-9äöüÄÖÜß.,;\-/()+ ]+$" maxlength="20" id="additional3" name="additional3" class="form-element"></div>
+        <div class="clearfix" style="margin-bottom: 5px"></div>
+
+        <div class="col40"><strong><label for="country">Land</label></strong></div>
+        <div class="col60">
+            <div class="select-container">
+                <select id="country" name="country" class="form-element" required>
+                    <option value disabled selected hidden></option>
+                    <option value="af">Afghanistan</option>
+                    <option value="eg">Ägypten</option>
+                    <option value="al">Albanien</option>
+                    <option value="dz">Algerien</option>
+                    <option value="ad">Andorra</option>
+                    <option value="ao">Angola</option>
+                    <option value="ag">Antigua und Barbuda</option>
+                    <option value="gq">Äquatorialguinea</option>
+                    <option value="ar">Argentinien</option>
+                    <option value="am">Armenien</option>
+                    <option value="az">Aserbaidschan</option>
+                    <option value="et">Äthiopien</option>
+                    <option value="au">Australien</option>
+                    <option value="bs">Bahamas</option>
+                    <option value="bh">Bahrain</option>
+                    <option value="bd">Bangladesch</option>
+                    <option value="bb">Barbados</option>
+                    <option value="by">Belarus</option>
+                    <option value="be">Belgien</option>
+                    <option value="bz">Belize</option>
+                    <option value="bj">Benin</option>
+                    <option value="bt">Bhutan</option>
+                    <option value="bo">Bolivien</option>
+                    <option value="ba">Bosnien und Herzegowina</option>
+                    <option value="bw">Botswana</option>
+                    <option value="br">Brasilien</option>
+                    <option value="bn">Brunei</option>
+                    <option value="bg">Bulgarien</option>
+                    <option value="bf">Burkina Faso</option>
+                    <option value="bi">Burundi</option>
+                    <option value="cl">Chile</option>
+                    <option value="cn">Volksrepublik China</option>
+                    <option value="cr">Costa Rica</option>
+                    <option value="dk">Dänemark</option>
+                    <option value="de">Deutschland</option>
+                    <option value="dm">Dominica</option>
+                    <option value="do">Dominikanische Republik</option>
+                    <option value="dj">Dschibuti</option>
+                    <option value="ec">Ecuador</option>
+                    <option value="ci">Elfenbeinküste</option>
+                    <option value="sv">El Salvador</option>
+                    <option value="er">Eritrea</option>
+                    <option value="ee">Estland</option>
+                    <option value="sz">Eswatini</option>
+                    <option value="fj">Fidschi</option>
+                    <option value="fi">Finnland</option>
+                    <option value="fr">Frankreich</option>
+                    <option value="ga">Gabun</option>
+                    <option value="gm">Gambia</option>
+                    <option value="ge">Georgien</option>
+                    <option value="gh">Ghana</option>
+                    <option value="gd">Grenada</option>
+                    <option value="gr">Griechenland</option>
+                    <option value="gt">Guatemala</option>
+                    <option value="gn">Guinea</option>
+                    <option value="gw">Guinea-Bissau</option>
+                    <option value="gy">Guyana</option>
+                    <option value="ht">Haiti</option>
+                    <option value="hn">Honduras</option>
+                    <option value="in">Indien</option>
+                    <option value="id">Indonesien</option>
+                    <option value="iq">Irak</option>
+                    <option value="ir">Iran</option>
+                    <option value="ie">Irland</option>
+                    <option value="is">Island</option>
+                    <option value="il">Israel</option>
+                    <option value="it">Italien</option>
+                    <option value="jm">Jamaika</option>
+                    <option value="jp">Japan</option>
+                    <option value="ye">Jemen</option>
+                    <option value="jo">Jordanien</option>
+                    <option value="kh">Kambodscha</option>
+                    <option value="cm">Kamerun</option>
+                    <option value="ca">Kanada</option>
+                    <option value="cv">Kap Verde</option>
+                    <option value="kz">Kasachstan</option>
+                    <option value="qa">Katar</option>
+                    <option value="ke">Kenia</option>
+                    <option value="kg">Kirgisistan</option>
+                    <option value="ki">Kiribati</option>
+                    <option value="co">Kolumbien</option>
+                    <option value="km">Komoren</option>
+                    <option value="cd">Kongo, Demokratische Republik</option>
+                    <option value="cg">Kongo, Republik</option>
+                    <option value="kp">Korea, Nord</option>
+                    <option value="kr">Korea, Süd</option>
+                    <option value="hr">Kroatien</option>
+                    <option value="cu">Kuba</option>
+                    <option value="kw">Kuwait</option>
+                    <option value="la">Laos</option>
+                    <option value="ls">Lesotho</option>
+                    <option value="lv">Lettland</option>
+                    <option value="lb">Libanon</option>
+                    <option value="lr">Liberia</option>
+                    <option value="ly">Libyen</option>
+                    <option value="li">Liechtenstein</option>
+                    <option value="lt">Litauen</option>
+                    <option value="lu">Luxemburg</option>
+                    <option value="mg">Madagaskar</option>
+                    <option value="mw">Malawi</option>
+                    <option value="my">Malaysia</option>
+                    <option value="mv">Malediven</option>
+                    <option value="ml">Mali</option>
+                    <option value="mt">Malta</option>
+                    <option value="ma">Marokko</option>
+                    <option value="mh">Marshallinseln</option>
+                    <option value="mr">Mauretanien</option>
+                    <option value="mu">Mauritius</option>
+                    <option value="mx">Mexiko</option>
+                    <option value="fm">Mikronesien</option>
+                    <option value="md">Moldau</option>
+                    <option value="mc">Monaco</option>
+                    <option value="mn">Mongolei</option>
+                    <option value="me">Montenegro</option>
+                    <option value="mz">Mosambik</option>
+                    <option value="mm">Myanmar</option>
+                    <option value="na">Namibia</option>
+                    <option value="nr">Nauru</option>
+                    <option value="np">Nepal</option>
+                    <option value="nz">Neuseeland</option>
+                    <option value="ni">Nicaragua</option>
+                    <option value="nl">Niederlande</option>
+                    <option value="ne">Niger</option>
+                    <option value="ng">Nigeria</option>
+                    <option value="mk">Nordmazedonien</option>
+                    <option value="no">Norwegen</option>
+                    <option value="om">Oman</option>
+                    <option value="at">Österreich</option>
+                    <option value="tl">Osttimor</option>
+                    <option value="pk">Pakistan</option>
+                    <option value="pw">Palau</option>
+                    <option value="pa">Panama</option>
+                    <option value="pg">Papua-Neuguinea</option>
+                    <option value="py">Paraguay</option>
+                    <option value="pe">Peru</option>
+                    <option value="ph">Philippinen</option>
+                    <option value="pl">Polen</option>
+                    <option value="pt">Portugal</option>
+                    <option value="rw">Ruanda</option>
+                    <option value="ro">Rumänien</option>
+                    <option value="ru">Russland</option>
+                    <option value="sb">Salomonen</option>
+                    <option value="zm">Sambia</option>
+                    <option value="ws">Samoa</option>
+                    <option value="sm">San Marino</option>
+                    <option value="st">São Tomé und Príncipe</option>
+                    <option value="sa">Saudi-Arabien</option>
+                    <option value="se">Schweden</option>
+                    <option value="ch">Schweiz</option>
+                    <option value="sn">Senegal</option>
+                    <option value="rs">Serbien</option>
+                    <option value="sc">Seychellen</option>
+                    <option value="sl">Sierra Leone</option>
+                    <option value="zw">Simbabwe</option>
+                    <option value="sg">Singapur</option>
+                    <option value="sk">Slowakei</option>
+                    <option value="si">Slowenien</option>
+                    <option value="so">Somalia</option>
+                    <option value="es">Spanien</option>
+                    <option value="lk">Sri Lanka</option>
+                    <option value="kn">St. Kitts und Nevis</option>
+                    <option value="lc">St. Lucia</option>
+                    <option value="vc">St. Vincent und die Grenadinen</option>
+                    <option value="za">Südafrika</option>
+                    <option value="sd">Sudan</option>
+                    <option value="ss">Südsudan</option>
+                    <option value="sr">Suriname</option>
+                    <option value="sy">Syrien</option>
+                    <option value="tj">Tadschikistan</option>
+                    <option value="tz">Tansania</option>
+                    <option value="th">Thailand</option>
+                    <option value="tg">Togo</option>
+                    <option value="to">Tonga</option>
+                    <option value="tt">Trinidad und Tobago</option>
+                    <option value="td">Tschad</option>
+                    <option value="cz">Tschechien</option>
+                    <option value="tn">Tunesien</option>
+                    <option value="tr">Türkei</option>
+                    <option value="tm">Turkmenistan</option>
+                    <option value="tv">Tuvalu</option>
+                    <option value="ug">Uganda</option>
+                    <option value="ua">Ukraine</option>
+                    <option value="hu">Ungarn</option>
+                    <option value="uy">Uruguay</option>
+                    <option value="uz">Usbekistan</option>
+                    <option value="vu">Vanuatu</option>
+                    <option value="ve">Venezuela</option>
+                    <option value="ae">Vereinigte Arabische Emirate</option>
+                    <option value="us">Vereinigte Staaten</option>
+                    <option value="gb">Vereinigtes Königreich</option>
+                    <option value="vn">Vietnam</option>
+                    <option value="cf">Zentral­afrikanische Republik</option>
+                    <option value="cy">Zypern</option>
+                </select>
+                <div class="icon icon-arrow-down"></div>
+            </div>
+        </div>
+        <div class="clearfix" style="margin-bottom: 50px"></div>
+
+        <p>In manchen Ländern ist für die Zustellung die Angabe einer weiteren Kontaktmöglichkeit (Handynummer oder E-Mail-Adresse) nötig. Falls nötig, gib diese bitte auch mit an.</p>
+
+        <div class="col40"><strong><label for="phone">Telefonnummer</label></strong></div>
+        <div class="col60"><input type="text" pattern="^[0-9 +]+$" maxlength="15" id="phone" name="phone" class="form-element"></div>
+        <div class="clearfix" style="margin-bottom: 5px"></div>
+
+        <div class="col40"><strong><label for="email">E-Mail-Adresse</label></strong></div>
+        <div class="col60"><input type="email" maxlength="50" id="email" name="email" class="form-element"></div>
+        <div class="clearfix" style="margin-bottom: 50px"></div>
+
+        <input type="hidden" name="github_user" value="{{user.github_user}}">
+        <input type="hidden" name="token" value="{{user.token}}">
+        <input type="hidden" name="language" value="{{user.language}}">
+
+        <p>Bitte überprüfe Deine Angaben vor dem Absenden noch einmal gründlich.</p>
+        <div style="float: right; margin-top: 10px"><input class="button button-primary" type="submit" value="Abschicken"></div>
+        <div class="clearfix"></div>
+    </form>
+</div>
