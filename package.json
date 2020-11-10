@@ -21,6 +21,8 @@
         "@octokit/plugin-throttling": "^3.3.3",
         "@octokit/rest": "^18.0.3",
         "axios": "^0.19.2",
+        "git-diff": "^2.0.6",
+        "gitdiff-parser": "^0.2.2",
         "hapi-cron": "^1.1.0",
         "joi": "^17.2.0",
         "knex": "^0.21.3",
@@ -32,6 +34,7 @@
     },
     "scripts": {
         "dev": "nodemon src/index.js",
+        "debug": "nodemon --inspect src/index.js",
         "prod": "pm2 startOrRestart ecosystem.config.js --no-daemon"
     },
     "husky": {

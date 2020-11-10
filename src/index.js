@@ -7,6 +7,7 @@ const knex = require('knex')(require('../knexfile').development);
 const init = async () => {
     const server = Hapi.server({
         port: 3000,
+        debug: { request: ['error'] },
         host: '0.0.0.0',
         routes: {
             cors: true,
@@ -192,6 +193,19 @@ const init = async () => {
                         .redirect(`https://www.${redirect_domain}/blog/hacktoberfest-2020#!error=validation`)
                         .takeover();
                 },
+            },
+        },
+    });
+
+    server.route({
+        method: 'GET',
+        path: '/datareview/{PR}',
+        handler: require('./handlers/datareview/handler'),
+        options: {
+            validate: {
+                params: Joi.object({
+                    PR: Joi.number().integer().greater(0).required(),
+                }),
             },
         },
     });
