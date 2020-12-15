@@ -40,7 +40,7 @@ async function datadiff(request, h) {
 
     let result = JSON.parse(JSON.stringify(suggestion)); // 🤦
     //TODO: add trimmer
-    let handlers = [address_remove_company, remove_slug];
+    let handlers = [/*address_remove_company,*/ remove_slug];
     for (a_handler of handlers) {
         result = await a_handler(result);
     }
@@ -49,43 +49,53 @@ async function datadiff(request, h) {
     if (diff === undefined) return h.response({ message: 'Nothing to change.' }).code(200);
     const fakeDiffPrefix = 'diff --git a/a.json b/b.json\nindex 1234567..1234567 100644\n--- a/a.json\n+++ b/b.json\n';
     const fakeDiffString = (fakeDiffPrefix + diff).replace('\n', `'\\n`);
-    return gitDiffParser.parse(fakeDiffString);
+    const hunks = gitDiffParser.parse(fakeDiffString)[0].hunks; // TODO undefined
 
-    let review_comments = [];
-    const result_json = JSON.stringify(result, null, 4);
-    let suggestion_line_no = 0;
-    let result_line_no = 0;
-    let lines_for_comments = [];
+    linechanges = {};
 
-    const suggest_lines = JSON.stringify(suggestion, null, 4).split('\n');
-    const result_lines = JSON.stringify(result, null, 4).split('\n');
+    for (hunk of hunks) {
+        for (change of hunk.changes) {
+            if (change.isNormal) continue;
+            linechanges[change.lineNumber] = {};
+            if (change.isDelete) {
+                console.log('D', change.lineNumber, change.content);
+                linechanges[change.lineNumber].delete = true;
+            } else if (change.isInsert) {
+                console.log('I', change.lineNumber, change.content);
+                linechanges[change.lineNumber].insert = change.content;
+            }
+        }
+    }
 
-    const body =
-        'Beep Boop I am a bot and this is my suggestion:\n' +
-        '```suggestion\n' +
-        JSON.stringify(result, null, 4) +
-        '\n```';
+    let reviewcomments = [];
+
+    for (lineno in linechanges) {
+        let comment = {
+            path: file,
+            position: parseInt(lineno, 10), // TODO this only works with NEW suggestions
+        };
+        comment.body = '```suggestion\n' + (linechanges[lineno].insert || '') + '\n```';
+        reviewcomments.push(comment);
+    }
+
+    console.log(reviewcomments);
+
+    const body = 'Beep Boop I am a bot and this is my suggestion:\n';
 
     //return JSON.stringify(result, null, 4);
     // TODO: determine which lines are affected, only comment on those
     // atm we do not support the addition or removal of lines
-    octokit.pulls.createReview({
+    await octokit.pulls.createReview({
         owner,
         repo,
         pull_number,
+        body,
         event: 'COMMENT',
-        comments: [
-            {
-                path: file,
-                side: 'RIGHT', // TODO
-                line: suggest_lines.length,
-                start_line: 1,
-                start_side: 'RIGHT', //TODO
-                body: body,
-            },
-        ],
+        comments: reviewcomments,
     });
 
+    //TODO: Don't delete old lines by inserting new ones
+    //TODO: linebreaks in diff
     return result;
 }
 
