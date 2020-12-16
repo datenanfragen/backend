@@ -40,7 +40,7 @@ async function datadiff(request, h) {
 
     let result = JSON.parse(JSON.stringify(suggestion)); // 🤦
     //TODO: add trimmer
-    let handlers = [/*address_remove_company,*/ remove_slug];
+    let handlers = [/*address_remove_company,*/ remove_slug, website];
     for (a_handler of handlers) {
         result = await a_handler(result);
     }
@@ -52,20 +52,70 @@ async function datadiff(request, h) {
     const hunks = gitDiffParser.parse(fakeDiffString)[0].hunks; // TODO undefined
 
     linechanges = {};
+    oldmax = 0;
 
     for (hunk of hunks) {
         for (change of hunk.changes) {
-            if (change.isNormal) continue;
+            if (change.isNormal) {
+                oldmax = Math.max(oldmax, change.oldLineNumber);
+                continue;
+            }
             linechanges[change.lineNumber] = {};
             if (change.isDelete) {
                 console.log('D', change.lineNumber, change.content);
-                linechanges[change.lineNumber].delete = true;
+                linechanges[change.lineNumber].delete = true; // unused
             } else if (change.isInsert) {
                 console.log('I', change.lineNumber, change.content);
-                linechanges[change.lineNumber].insert = change.content;
+                if (!linechanges[change.lineNumber].insert) {
+                    linechanges[change.lineNumber].insert = change.content;
+                } else {
+                    linechanges[change.lineNumber].insert += '\n' + change.content;
+                }
             }
         }
     }
+
+    const newmax = Math.max(...Object.keys(linechanges).map((x) => parseInt(x)));
+    console.error(oldmax, newmax);
+    let newlinechanges = JSON.parse(JSON.stringify(linechanges));
+    console.log(linechanges);
+
+    // merge inserted lines
+    if (newmax > oldmax) {
+        for (lineno of Object.keys(linechanges).map((x) => parseInt(x))) {
+            if (lineno > oldmax) {
+                newlinechanges[oldmax].insert += '\n' + linechanges[lineno].insert;
+                delete newlinechanges[lineno];
+            }
+        }
+    }
+    console.log(newlinechanges);
+    linechanges = newlinechanges;
+
+    // add the old strings
+    // e.g. line 9 was "test" before. But now we insert a new line after line 9: "new".
+    // --> line 9 should be "new\ntest"
+    for (hunk of hunks) {
+        for (change of hunk.changes) {
+            if (!change.isNormal) continue;
+            if (change.oldLineNumber === change.newLineNumber) continue;
+            if (linechanges[change.oldLineNumber] && linechanges[change.oldLineNumber].insert) {
+                linechanges[change.oldLineNumber].insert += '\n' + change.content;
+            } else {
+                h.response({ message: 'TODO' }).code(501);
+            }
+        }
+    }
+    console.log(linechanges);
+
+    // now merge adjacent changes
+    for (let i = 0; i < oldmax; i++) {
+        if (!(linechanges[i] && linechanges[i].insert)) continue;
+        if (!(linechanges[i + 1] && linechanges[i + 1].insert)) continue;
+        linechanges[i].insert += '\n' + linechanges[i + 1].insert;
+        delete linechanges[i + 1];
+    }
+    console.log(linechanges);
 
     let reviewcomments = [];
 
@@ -81,10 +131,6 @@ async function datadiff(request, h) {
     console.log(reviewcomments);
 
     const body = 'Beep Boop I am a bot and this is my suggestion:\n';
-
-    //return JSON.stringify(result, null, 4);
-    // TODO: determine which lines are affected, only comment on those
-    // atm we do not support the addition or removal of lines
     await octokit.pulls.createReview({
         owner,
         repo,
@@ -93,9 +139,8 @@ async function datadiff(request, h) {
         event: 'COMMENT',
         comments: reviewcomments,
     });
-
-    //TODO: Don't delete old lines by inserting new ones
     //TODO: linebreaks in diff
+    //TODO: deletion of lines not supported atm
     return result;
 }
 
@@ -108,9 +153,16 @@ async function address_remove_company(suggestion) {
 }
 
 async function remove_slug(suggestion) {
-    let tmp = suggestion;
+    let tmp = JSON.parse(JSON.stringify(suggestion));
+    //delete tmp.slug;
     tmp.testparameter = 'some new line';
+    tmp.testparametertwo = 'test';
     return tmp;
+}
+
+async function website(suggestion) {
+    suggestion.website = 'example.com';
+    return suggestion;
 }
 
 module.exports = datadiff;
