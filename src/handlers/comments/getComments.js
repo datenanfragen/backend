@@ -1,12 +1,11 @@
 const config = require('../../../config.json');
 async function getComments(request, h) {
-    let where_clause = { is_accepted: true };
-    if (request.params.target) where_clause.target = request.params.target;
+    const where_clause = { is_accepted: true, ...(request.params.target && { target: request.params.target }) };
     return await request.server.methods
         .knex('comments')
         .select()
         .where(where_clause)
-        .limit(config.comments.limit)
+        .limit(request.params.target ? config.comments.limit : Number.MAX_SAFE_INTEGER)
         .then((data) =>
             data.map((item) => {
                 try {
@@ -44,7 +43,7 @@ function atomFeedForItems(items, target) {
         <title>${!target ? item.target + ':' : ''}${item.message
             .replace(/\s+/g, ' ')
             .replace(/^(.{40}[^\s]*).*/, '$1')}</title>
-        <id>datenanfragenDE:${target}:comment:${item.id}</id>
+        <id>datenanfragenDE:${item.target}:comment:${item.id}</id>
         <updated>${item.added_at}</updated>
         <author><name>${item.author}</name></author>
         <content type="text">${item.message}</content>
