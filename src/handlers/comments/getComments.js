@@ -4,7 +4,7 @@ async function getComments(request, h) {
         .knex('comments')
         .select()
         .where({ is_accepted: true, ...(request.params.target && { target: request.params.target }) })
-        .limit(request.params.target ? config.comments.limit : Number.MAX_SAFE_INTEGER)
+        .limit(request.params.target ? Number.MAX_SAFE_INTEGER : config.comments.limit)
         .then((data) =>
             data.map((item) => {
                 try {
