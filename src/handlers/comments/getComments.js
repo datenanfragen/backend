@@ -1,11 +1,10 @@
+const config = require('../../../config.json');
 async function getComments(request, h) {
     return await request.server.methods
         .knex('comments')
         .select()
-        .where({
-            target: request.params.target,
-            is_accepted: true,
-        })
+        .where({ is_accepted: true, ...(request.params.target && { target: request.params.target }) })
+        .limit(request.params.target ? config.comments.limit : Number.MAX_SAFE_INTEGER)
         .then((data) =>
             data.map((item) => {
                 try {
@@ -38,10 +37,11 @@ function atomFeedForItems(items, target) {
     );
 
     // Excerpt regex taken from https://stackoverflow.com/a/5454297
+    const excerpt = (str) => str.replace(/\s+/g, ' ').replace(/^(.{40}[^\s]*).*/, '$1');
     const entries = items.map(
         (item) => `    <entry>
-        <title>${item.message.replace(/\s+/g, ' ').replace(/^(.{50}[^\s]*).*/, '$1')}</title>
-        <id>datenanfragenDE:${target}:comment:${item.id}</id>
+        <title>${!target ? item.target + ': ' : ''}${excerpt(item.message)}</title>
+        <id>datenanfragenDE:${item.target}:comment:${item.id}</id>
         <updated>${item.added_at}</updated>
         <author><name>${item.author}</name></author>
         <content type="text">${item.message}</content>
@@ -50,9 +50,9 @@ function atomFeedForItems(items, target) {
 
     return `<?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-    <title>${target}</title>
+    <title>${target || 'All comments'}</title>
     <updated>${feed_updated}</updated>
-    <id>datenanfragenDE:${target}:comments</id>
+    <id>datenanfragenDE:${target || 'all'}:comments</id>
     <generator uri="https://github.com/datenanfragen/backend">Datenanfragen.de backend</generator>
 
 ${entries.join('\n')}

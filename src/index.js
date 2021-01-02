@@ -92,7 +92,7 @@ const init = async () => {
             validate: {
                 params: Joi.object({
                     action: Joi.string().valid('get', 'feed').required(),
-                    target: Joi.string().required(),
+                    target: Joi.string(),
                 }),
             },
         },

@@ -11,7 +11,8 @@
         "service_url": "https://server.tld/comments",
         "token_sender": "comments@server.tld",
         "token_recipients": "admin@server.tld, moderator@server.tld",
-        "retention_days": 14
+        "retention_days": 14,
+        "limit": 200
     },
     "suggest": {
         "owner": "datenanfragen",
