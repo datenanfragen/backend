@@ -2,7 +2,7 @@ const config = require('../../../config.json');
 async function getComments(request, h) {
     return await request.server.methods
         .knex('comments')
-        .select()
+        .select('id', 'author', 'message', 'target', 'additional', 'added_at')
         .where({ is_accepted: true, ...(request.params.target && { target: request.params.target }) })
         .limit(request.params.target ? Number.MAX_SAFE_INTEGER : config.comments.limit)
         .then((data) =>
