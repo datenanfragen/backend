@@ -193,7 +193,7 @@ const init = async () => {
                     accept_terms: Joi.string().valid('on').required(),
                     accept_us_transfers: Joi.string().valid('on').required(),
                     language: Joi.string().valid('de', 'en').required(),
-                    year: Joi.string().valid('2020').required(),
+                    year: Joi.string().valid('2020', '2021').required(),
                 }),
                 failAction: async (request, h, err) => {
                     const redirect_domain = request.payload.language === 'de' ? 'datenanfragen.de' : 'datarequests.org';
