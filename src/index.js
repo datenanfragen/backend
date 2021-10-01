@@ -109,7 +109,7 @@ const init = async () => {
                     new: Joi.boolean().required(),
                     data: Joi.object({
                         slug: Joi.string().required(),
-                        'relevant-countries': Joi.array().items(Joi.string()).default(['all']),
+                        'relevant-countries': Joi.array().items(Joi.string().allow(null)).default(['all']),
                         name: Joi.string(),
                         web: Joi.string().uri({
                             scheme: [/https?/],
