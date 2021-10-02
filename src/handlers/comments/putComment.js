@@ -8,8 +8,8 @@ async function putComment(request, h) {
 
     const item = {
         id: nanoid(),
-        author: request.payload.author ? stripTags(request.payload.author) : 'Anonymous',
-        message: request.payload.message,
+        author: request.payload.author ? stripTags(request.payload.author).replace(/\s/g, "") : 'Anonymous',
+        message: request.payload.message.replace(/\s/g, ""),
         target: request.payload.target.replace(/[^a-zA-Z0-9/_-]/, '').replace(/^\s*\/*\s*|\s*\/*\s*$/gm, ''),
         additional: request.payload.additional instanceof Object ? JSON.stringify(request.payload.additional) : '{}',
         accept_token: nanoid(),
