@@ -39,9 +39,10 @@ function atomFeedForItems(items, target) {
 
     // Excerpt regex taken from https://stackoverflow.com/a/5454297
     const excerpt = (str) => str.replace(/\s+/g, ' ').replace(/^(.{40}[^\s]*).*/, '$1');
+    const cleanHtmlTags = (str) => str.replaceAll(/<[\/]?[A-Za-z0-9]*[<A-Za-z0-9>]?/g,'')
     const entries = items.map(
         (item) => `    <entry>
-        <title>${!target ? item.target + ': ' : ''}${excerpt(item.message)}</title>
+        <title>${!target ? item.target + ': ' : ''}${cleanHtmlTags(excerpt(item.message))}</title>
         <id>datenanfragenDE:${item.target}:comment:${item.id}</id>
         <updated>${item.added_at}</updated>
         <author><name>${item.author}</name></author>
