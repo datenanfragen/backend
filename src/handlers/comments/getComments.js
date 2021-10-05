@@ -1,5 +1,5 @@
 const config = require('../../../config.json');
-const { stripTags } = require('../util/functions');
+const { stripTags } = require('../../util/functions');
 
 async function getComments(request, h) {
     return await request.server.methods

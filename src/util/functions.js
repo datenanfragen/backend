@@ -7,7 +7,7 @@ function partition(array, predicate) {
 }
 
 function stripTags(str) {
-    return str.replace(/<[^>]+[>]?/gi, '');
+    return str.replace(/<[^>]+>/gi, '');
 }
 
 module.exports = { partition, stripTags };
