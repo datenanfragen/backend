@@ -47,7 +47,7 @@ function atomFeedForItems(items, target) {
         <id>datenanfragenDE:${item.target}:comment:${item.id}</id>
         <updated>${item.added_at}</updated>
         <author><name>${item.author}</name></author>
-        <content type="text">${item.message}</content>
+        <content type="text">${stripTags(item.message)}</content>
     </entry>`
     );
 
