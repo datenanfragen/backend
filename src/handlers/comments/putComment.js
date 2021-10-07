@@ -1,6 +1,7 @@
 const { nanoid } = require('nanoid');
 const nodemailer = require('nodemailer');
 const config = require('../../../config.json');
+const { stripTags } = require('../../util/functions');
 
 async function putComment(request, h) {
     const service_url =
@@ -63,10 +64,6 @@ If you don't want to accept the comment, you don't need to do anything.`,
     };
 
     return transporter.sendMail(mailOptions);
-}
-
-function stripTags(str) {
-    return str.replace(/<[^>]+>/gi, '');
 }
 
 module.exports = putComment;

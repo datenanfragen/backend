@@ -1,4 +1,6 @@
 const config = require('../../../config.json');
+const { stripTags } = require('../../util/functions');
+
 async function getComments(request, h) {
     return await request.server.methods
         .knex('comments')
@@ -41,7 +43,7 @@ function atomFeedForItems(items, target) {
     const excerpt = (str) => str.replace(/\s+/g, ' ').replace(/^(.{40}[^\s]*).*/, '$1');
     const entries = items.map(
         (item) => `    <entry>
-        <title>${!target ? item.target + ': ' : ''}${excerpt(item.message)}</title>
+        <title>${!target ? item.target + ': ' : ''}${excerpt(stripTags(item.message))}</title>
         <id>datenanfragenDE:${item.target}:comment:${item.id}</id>
         <updated>${item.added_at}</updated>
         <author><name>${item.author}</name></author>

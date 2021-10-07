@@ -6,4 +6,8 @@ function partition(array, predicate) {
     ]);
 }
 
-module.exports = { partition };
+function stripTags(str) {
+    return str.replace(/<[^>]+>/gi, '');
+}
+
+module.exports = { partition, stripTags };
