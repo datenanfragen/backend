@@ -8,8 +8,28 @@ const octokit = new myOctokit({
     userAgent: 'Datenanfragen.de suggest-api',
 });
 
+function cleanCompanyData(company) {
+    // Remove all `null` and `undefined` values
+    const cleanedCompany = Object.fromEntries(
+        Object.keys(company)
+            .filter((key) => company[key] !== null || company[key] !== undefined)
+            .map((key) => {
+                return [key, company[key]];
+            })
+    );
+
+    // Trim all strings
+    return Object.fromEntries(
+        Object.keys(cleanedCompany).map((key) => {
+            if (typeof cleanedCompany[key] !== 'string') return [key, cleanedCompany[key]];
+
+            return [key, cleanedCompany[key].trim()];
+        })
+    );
+}
+
 async function suggest(request, h) {
-    let company = request.payload.data;
+    let company = cleanCompanyData(request.payload.data);
 
     const file_path = `companies/${company.slug}.json`;
     const files = {};
