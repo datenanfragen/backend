@@ -9,7 +9,7 @@ const octokit = new myOctokit({
 });
 
 function cleanCompanyData(company) {
-    // Remove all `null` and `undefined` values
+    // Remove all `null` and `undefined` values & all null values inside array properties
     const cleanedCompany = Object.fromEntries(
         Object.keys(company)
             .filter((key) => company[key] !== null || company[key] !== undefined)
@@ -21,9 +21,13 @@ function cleanCompanyData(company) {
     // Trim all strings
     return Object.fromEntries(
         Object.keys(cleanedCompany).map((key) => {
-            if (typeof cleanedCompany[key] !== 'string') return [key, cleanedCompany[key]];
+            // Trim strings
+            if (typeof cleanedCompany[key] === 'string') return [key, cleanedCompany[key].trim()];
 
-            return [key, cleanedCompany[key].trim()];
+            // Remove null values from array properties
+            if (Array.isArray(cleanedCompany[key])) return [key, cleanedCompany[key].filter(Boolean)];
+
+            return [key, cleanedCompany[key]];
         })
     );
 }
