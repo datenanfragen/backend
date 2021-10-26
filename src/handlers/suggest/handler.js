@@ -8,6 +8,16 @@ const octokit = new myOctokit({
     userAgent: 'Datenanfragen.de suggest-api',
 });
 
+function cleanElement(element) {
+    // Trim strings
+    if (typeof element === 'string') return element.trim();
+
+    // Remove null values from array properties
+    if (Array.isArray(element)) return element.filter(Boolean).map((elem) => cleanElement(elem));
+
+    return element;
+}
+
 function cleanCompanyData(company) {
     // Remove all `null` and `undefined` values & all null values inside array properties
     const cleanedCompany = Object.fromEntries(
@@ -21,13 +31,7 @@ function cleanCompanyData(company) {
     // Trim all strings
     return Object.fromEntries(
         Object.keys(cleanedCompany).map((key) => {
-            // Trim strings
-            if (typeof cleanedCompany[key] === 'string') return [key, cleanedCompany[key].trim()];
-
-            // Remove null values from array properties
-            if (Array.isArray(cleanedCompany[key])) return [key, cleanedCompany[key].filter(Boolean)];
-
-            return [key, cleanedCompany[key]];
+            return [key, cleanElement(cleanedCompany[key])];
         })
     );
 }
