@@ -19,20 +19,12 @@ function cleanElement(element) {
 }
 
 function cleanCompanyData(company) {
-    // Remove all `null` and `undefined` values & all null values inside array properties
-    const cleanedCompany = Object.fromEntries(
-        Object.keys(company)
-            .filter((key) => company[key] !== null || company[key] !== undefined)
-            .map((key) => {
-                return [key, company[key]];
-            })
-    );
-
-    // Trim all strings
     return Object.fromEntries(
-        Object.keys(cleanedCompany).map((key) => {
-            return [key, cleanElement(cleanedCompany[key])];
-        })
+        Object.keys(company)
+            // Remove all `null` and `undefined` values & all null values inside array properties
+            .filter((key) => company[key] !== null && company[key] !== undefined)
+            // Trim all strings
+            .map((key) => [key, cleanElement(company[key])])
     );
 }
 
