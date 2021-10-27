@@ -74,7 +74,7 @@ async function suggest(request, h) {
                             pull_number: pr.data.number,
                             body: `This suggestion was submitted through the website.
 
-**[Edit](https://company-json.datenanfragen.de/#!doc=${encodeURIComponent(JSON.stringify(company))})**`,
+**[Edit](https://company-json.datenanfragen.de/#!doc=${encodeURIComponent(JSON.stringify(company))} )**`,
                             maintainer_can_modify: true, // We cannot set this setting through the plugin, but because it is just a gimmick, we can do it afterwards just as well.
                         })
                     )
