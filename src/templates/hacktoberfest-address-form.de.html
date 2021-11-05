@@ -9,35 +9,31 @@
 <div class="box form-group" style="max-width: 650px; margin: auto">
     <form action="/hacktoberfest/address" method="post">
         {{#if user.gets_tshirt}}
-        <p>Bitte gib die Größe an, in der Du Dein T-Shirt erhalten möchtest. Zur Referenz kannst Du Dir die <a href="https://www.fruitoftheloom.eu/size-guide/?lang=de">T-Shirt-Größen-Übersicht</a> anschauen.</p>
+        <p>Bitte gib die Größe an, in der Du Dein T-Shirt erhalten möchtest. Zur Referenz kannst Du Dir die T-Shirt-Größen-Übersicht für <a href="https://assets.bc-collection.eu/products-sizes/TU01B_BC_SIZES.jpg">Unisex-</a> und <a href="https://assets.bc-collection.eu/products-sizes/TW02B_BC_SIZES.jpg">taillierten</a> Schnitt anschauen.</p>
         <div class="col40"><strong><label for="size">T-Shirt-Größe</label></strong></div>
         <div class="col60">
             <div class="select-container">
                 <select id="size" name="size" class="form-element" required>
                     <option value disabled selected hidden></option>
-                    <optgroup label="Herren">
-                        <option value="men-s">Herren S</option>
-                        <option value="men-m">Herren M</option>
-                        <option value="men-l">Herren L</option>
-                        <option value="men-xl">Herren XL</option>
-                        <option value="men-2xl">Herren 2XL</option>
-                        <option value="men-3xl">Herren 3XL</option>
+                    <optgroup label="Unisex">
+                        <option value="unisex-xs">Unisex XS</option>
+                        <option value="unisex-s">Unisex S</option>
+                        <option value="unisex-m">Unisex M</option>
+                        <option value="unisex-l">Unisex L</option>
+                        <option value="unisex-xl">Unisex XL</option>
+                        <option value="unisex-2xl">Unisex 2XL</option>
+                        <option value="unisex-3xl">Unisex 3XL</option>
+                        <option value="unisex-4xl">Unisex 4XL</option>
+                        <option value="unisex-5xl">Unisex 5XL</option>
                     </optgroup>
-                    <optgroup label="Damen">
-                        <option value="women-xs">Damen XS</option>
-                        <option value="women-s">Damen S</option>
-                        <option value="women-m">Damen M</option>
-                        <option value="women-l">Damen L</option>
-                        <option value="women-xl">Damen XL</option>
-                        <option value="women-2xl">Damen 2XL</option>
-                    </optgroup>
-                    <optgroup label="Kinder">
-                        <option value="kids-104">Kinder 104 (3 – 4)</option>
-                        <option value="kids-116">Kinder 116 (5 – 6)</option>
-                        <option value="kids-128">Kinder 128 (7 – 8)</option>
-                        <option value="kids-140">Kinder 140 (9 – 11)</option>
-                        <option value="kids-152">Kinder 152 (12 – 13)</option>
-                        <option value="kids-164">Kinder 164 (14 – 15)</option>
+                    <optgroup label="Tailliert">
+                        <option value="tapered-xs">Tailliert XS</option>
+                        <option value="tapered-s">Tailliert S</option>
+                        <option value="tapered-m">Tailliert M</option>
+                        <option value="tapered-l">Tailliert L</option>
+                        <option value="tapered-xl">Tailliert XL</option>
+                        <option value="tapered-2xl">Tailliert 2XL</option>
+                        <option value="tapered-3xl">Tailliert 3XL</option>
                     </optgroup>
                 </select>
                 <div class="icon icon-arrow-down"></div>

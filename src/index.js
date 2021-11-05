@@ -226,7 +226,7 @@ const init = async () => {
                 payload: Joi.object({
                     // prettier-ignore
                     size: Joi.string()
-                        .valid('men-s', 'men-m', 'men-l', 'men-xl', 'men-2xl', 'men-3xl', 'women-xs', 'women-s', 'women-m', 'women-l', 'women-xl', 'women-2xl', 'kids-104', 'kids-116', 'kids-128', 'kids-140', 'kids-152', 'kids-164'),
+                        .valid('unisex-xs', 'unisex-s', 'unisex-m', 'unisex-l', 'unisex-xl', 'unisex-2xl', 'unisex-3xl', 'unisex-4xl', 'unisex-5xl', 'tapered-xs', 'tapered-s', 'tapered-m', 'tapered-l', 'tapered-xl', 'tapered-2xl', 'tapered-3xl'),
 
                     name: joi_validators.post_string.max(30).required(),
                     additional1: joi_validators.post_string.max(40).allow(''),

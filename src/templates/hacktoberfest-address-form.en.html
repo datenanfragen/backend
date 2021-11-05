@@ -9,35 +9,31 @@
 <div class="box form-group" style="max-width: 700px; margin: auto">
     <form action="/hacktoberfest/address" method="post">
         {{#if user.gets_tshirt}}
-        <p>Please enter your tshirt size. For reference, you can take a look at the <a href="https://www.fruitoftheloom.eu/size-guide/?lang=en">size guide</a>.</p>
+        <p>Please enter your tshirt size. For reference, you can take a look at the size guide for <a href="https://assets.bc-collection.eu/products-sizes/TU01B_BC_SIZES.jpg">unisex</a> and <a href="https://assets.bc-collection.eu/products-sizes/TW02B_BC_SIZES.jpg">tapered</a> fit.</p>
         <div class="col40"><strong><label for="size">Tshirt size</label></strong></div>
         <div class="col60">
             <div class="select-container">
                 <select id="size" name="size" class="form-element" required>
                     <option value disabled selected hidden></option>
-                    <optgroup label="Men">
-                        <option value="men-s">Men S</option>
-                        <option value="men-m">Men M</option>
-                        <option value="men-l">Men L</option>
-                        <option value="men-xl">Men XL</option>
-                        <option value="men-2xl">Men 2XL</option>
-                        <option value="men-3xl">Men 3XL</option>
+                    <optgroup label="Unisex">
+                        <option value="unisex-xs">Unisex XS</option>
+                        <option value="unisex-s">Unisex S</option>
+                        <option value="unisex-m">Unisex M</option>
+                        <option value="unisex-l">Unisex L</option>
+                        <option value="unisex-xl">Unisex XL</option>
+                        <option value="unisex-2xl">Unisex 2XL</option>
+                        <option value="unisex-3xl">Unisex 3XL</option>
+                        <option value="unisex-4xl">Unisex 4XL</option>
+                        <option value="unisex-5xl">Unisex 5XL</option>
                     </optgroup>
-                    <optgroup label="Ladies">
-                        <option value="women-xs">Ladies XS</option>
-                        <option value="women-s">Ladies S</option>
-                        <option value="women-m">Ladies M</option>
-                        <option value="women-l">Ladies L</option>
-                        <option value="women-xl">Ladies XL</option>
-                        <option value="women-2xl">Ladies 2XL</option>
-                    </optgroup>
-                    <optgroup label="Kids">
-                        <option value="kids-104">Kids 104 (3 – 4)</option>
-                        <option value="kids-116">Kids 116 (5 – 6)</option>
-                        <option value="kids-128">Kids 128 (7 – 8)</option>
-                        <option value="kids-140">Kids 140 (9 – 11)</option>
-                        <option value="kids-152">Kids 152 (12 – 13)</option>
-                        <option value="kids-164">Kids 164 (14 – 15)</option>
+                    <optgroup label="Tapered">
+                        <option value="tapered-xs">Tapered XS</option>
+                        <option value="tapered-s">Tapered S</option>
+                        <option value="tapered-m">Tapered M</option>
+                        <option value="tapered-l">Tapered L</option>
+                        <option value="tapered-xl">Tapered XL</option>
+                        <option value="tapered-2xl">Tapered 2XL</option>
+                        <option value="tapered-3xl">Tapered 3XL</option>
                     </optgroup>
                 </select>
                 <div class="icon icon-arrow-down"></div>
