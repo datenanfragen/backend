@@ -38,6 +38,7 @@ async function suggest(request, h) {
     const title =
         (request.payload.new ? `Add '${company.name || company.web}'` : `Update '${company.name || company.slug}'`) +
         ' (community contribution)';
+    const branch_name = `suggest_${company.slug}_${Date.now()}`;
 
     return await octokit
         .createPullRequest({
@@ -46,7 +47,7 @@ async function suggest(request, h) {
             base: config.suggest.branch,
             title,
             body: 'This suggestion was submitted through the website.',
-            head: `suggest_${company.slug}_${Date.now()}`,
+            head: branch_name,
             changes: [
                 {
                     files,
@@ -56,7 +57,6 @@ async function suggest(request, h) {
         })
         .then((pr) => {
             if (pr && pr.data) {
-                // TODO: Replace with ?. in node 14
                 company.sources.push(pr.data.html_url);
 
                 return commitStringFileToPullRequest(
@@ -74,7 +74,9 @@ async function suggest(request, h) {
                             pull_number: pr.data.number,
                             body: `This suggestion was submitted through the website.
 
-**[Edit](https://company-json.datenanfragen.de/#!doc=${encodeURIComponent(JSON.stringify(company))} )**`,
+**[Edit in company JSON generator](https://company-json.datenanfragen.de/#!url=${encodeURIComponent(
+                                `https://raw.githubusercontent.com/${config.suggest.owner}/${config.suggest.repo}/${branch_name}/${file_path}.json`
+                            )} )**`,
                             maintainer_can_modify: true, // We cannot set this setting through the plugin, but because it is just a gimmick, we can do it afterwards just as well.
                         })
                     )
@@ -127,7 +129,7 @@ async function suggest(request, h) {
                         '\n```' +
                         `
 
-**[Edit](https://company-json.datenanfragen.de/#!doc=${encodeURIComponent(JSON.stringify(company))})**`,
+**[Edit](https://company-json.datenanfragen.de/#!doc=${encodeURIComponent(JSON.stringify(company))} )**`,
                 })
                 .then((result) =>
                     h
