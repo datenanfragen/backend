@@ -18,7 +18,8 @@
         "owner": "datenanfragen",
         "repo": "data",
         "branch": "master",
-        "github_token": "TOKEN"
+        "github_token": "TOKEN",
+        "token_owner": "datenanfragen-community-edits"
     },
     "donation": {
         "mollie": {
