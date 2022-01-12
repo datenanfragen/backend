@@ -21,7 +21,7 @@
         "@octokit/plugin-retry": "^3.0.4",
         "@octokit/plugin-throttling": "^3.3.3",
         "@octokit/rest": "^18.0.3",
-        "axios": "^0.19.2",
+        "axios": "^0.21.2",
         "handlebars": "^4.7.6",
         "hapi-cron": "^1.1.0",
         "joi": "^17.2.0",
