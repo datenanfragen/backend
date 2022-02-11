@@ -22,7 +22,7 @@
         "@octokit/plugin-throttling": "^3.3.3",
         "@octokit/rest": "^18.0.3",
         "axios": "^0.21.2",
-        "handlebars": "^4.7.6",
+        "handlebars": "^4.7.7",
         "hapi-cron": "^1.1.0",
         "joi": "^17.2.0",
         "knex": "^0.21.3",
