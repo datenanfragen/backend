@@ -1,5 +1,5 @@
 const Hapi = require('@hapi/hapi');
-const Joi = require('@hapi/joi');
+const Joi = require('joi');
 const Boom = require('@hapi/boom');
 const path = require('path');
 const knex = require('knex')(require('../knexfile').development);
