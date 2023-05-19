@@ -30,7 +30,7 @@
         "nodemailer": "^6.4.11",
         "octokit-plugin-create-pull-request": "^3.8.1",
         "pm2": "^4.4.0",
-        "sqlite3": "^5.0.3"
+        "sqlite3": "^5.1.5"
     },
     "scripts": {
         "dev": "nodemon -e js,mjs,json,html src/index.js",
