@@ -2,7 +2,7 @@ const Hapi = require('@hapi/hapi');
 const Joi = require('joi');
 const Boom = require('@hapi/boom');
 const path = require('path');
-const knex = require('knex')(require('../knexfile').development);
+const knex = require('knex').knex(require('../knexfile').development);
 const joi_validators = require('./util/joi');
 const joi = require('./util/joi');
 
