@@ -4,21 +4,10 @@ const { stripTags } = require('../../util/functions');
 async function getComments(request, h) {
     return await request.server.methods
         .knex('comments')
-        .select('id', 'author', 'message', 'target', 'additional', 'added_at')
+        .select('id', 'author', 'message', 'target', 'added_at')
         .where({ is_accepted: true, ...(request.params.target && { target: request.params.target }) })
         .orderBy('added_at', 'desc')
         .limit(request.params.target ? Number.MAX_SAFE_INTEGER : config.comments.limit)
-        .then((data) =>
-            data.map((item) => {
-                try {
-                    item.additional = JSON.parse(item.additional);
-                } catch (_) {
-                    item.additional = {};
-                }
-
-                return item;
-            })
-        )
         .then((data) => {
             switch (request.params.action) {
                 case 'get':
