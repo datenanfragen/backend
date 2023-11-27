@@ -71,9 +71,9 @@ const init = async () => {
         options: {
             validate: {
                 payload: Joi.object({
-                    author: Joi.string().allow(''),
-                    message: Joi.string().required(),
-                    target: Joi.string().required(),
+                    author: Joi.string().max(75).allow(''),
+                    message: Joi.string().max(10000).required(),
+                    target: Joi.string().max(150).required(),
                     additional: Joi.object(),
                 }),
             },
