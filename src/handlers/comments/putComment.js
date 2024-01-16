@@ -3,7 +3,13 @@ const nodemailer = require('nodemailer');
 const config = require('../../../config.json');
 const { stripTags } = require('../../util/functions');
 
+const successMessage =
+    'Successfully added comment. It will need to be accepted by an administrator before it is published.';
+
 async function putComment(request, h) {
+    // Silently drop ridiculously short comments, which are pretty much guaranteed to be spam.
+    if (request.payload.message?.length < 5) return { message: successMessage };
+
     const service_url =
         config.comments.service_url || `${request.headers['X-Forwarded-Proto']}://${request.headers['Host']}/comments`;
 
@@ -22,8 +28,7 @@ async function putComment(request, h) {
         .insert(item)
         .then(() => sendTokenMail(item, service_url))
         .then(() => ({
-            message:
-                'Successfully added comment. It will need to be accepted by an administrator before it is published.',
+            message: successMessage,
         }))
         .catch((e) => {
             console.error(e);
