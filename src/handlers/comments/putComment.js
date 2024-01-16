@@ -18,7 +18,6 @@ async function putComment(request, h) {
         author: request.payload.author ? stripTags(request.payload.author).trim() : 'Anonymous',
         message: request.payload.message.trim(),
         target: request.payload.target.replace(/[^a-zA-Z0-9/_-]/, '').replace(/^\s*\/*\s*|\s*\/*\s*$/gm, ''),
-        additional: request.payload.additional instanceof Object ? JSON.stringify(request.payload.additional) : '{}',
         accept_token: nanoid(),
         is_accepted: false,
         added_at: new Date().toISOString(),
@@ -57,7 +56,6 @@ async function sendTokenMail(comment, service_url) {
 ID: "${comment.id}"
 Author: "${comment.author}"
 Target post: "${comment.target}"
-Additional data: "${comment.additional}"
 
 Comment:
 "${comment.message}"
