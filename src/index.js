@@ -74,7 +74,6 @@ const init = async () => {
                     author: Joi.string().allow(''),
                     message: Joi.string().required(),
                     target: Joi.string().required(),
-                    additional: Joi.object(),
                 }),
             },
         },
