@@ -73,7 +73,7 @@ const init = async () => {
                 payload: Joi.object({
                     author: Joi.string().max(75).allow(''),
                     message: Joi.string().max(10000).required(),
-                    target: Joi.string().max(150).required()
+                    target: Joi.string().max(150).required(),
                 }),
             },
         },
