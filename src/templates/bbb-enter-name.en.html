@@ -1,0 +1,14 @@
+<h1>Join the room “{{room_name}}“</h1>
+
+<div class="form-group">
+    <form method="get">
+        <div class="col30"><strong><label for="name">Your name</label></strong></div>
+        <div class="col70">
+            <input type="text" id="name" name="name" class="form-element" maxlength="50" aria-describedby="name-help">
+            <p id="name-help" class="form-element-help">Every participant will be able to see your name. You can of course use a pseudonym instead. Feel free to also specify your pronouns and (if applicable) organization in parentheses.</p>
+        </div>
+        <div class="clearfix" style="margin-bottom: 20px"></div>
+
+        <input type="submit" class="button button-primary" id="submitButton" style="float: right;" value="Join">
+    </form>
+</div>

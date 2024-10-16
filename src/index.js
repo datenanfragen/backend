@@ -36,6 +36,16 @@ const init = async () => {
     // Expose the database to the routes.
     server.method('knex', knex);
 
+    // Configure the cookie for administering BBB.
+    server.state('bbb_admin_token', {
+        ttl: 1000 * 60 * 60 * 24 * 365,
+        isSecure: true,
+        isHttpOnly: false,
+        encoding: 'none',
+        clearInvalid: false,
+        strictHeader: true,
+    });
+
     await server.register({
         plugin: require('hapi-cron'),
         options: {
@@ -56,13 +66,14 @@ const init = async () => {
         },
     });
 
-    server.views({
+    const view_manager = server.views({
         engines: { html: require('handlebars') },
         layout: true,
         relativeTo: __dirname,
         path: 'templates',
         layoutPath: 'templates/layout',
     });
+    view_manager.registerHelper('jsonify', (obj) => JSON.stringify(obj, null, 2));
 
     server.route({
         method: 'PUT',
@@ -271,6 +282,66 @@ const init = async () => {
                     github_user: joi_validators.github_user.required(),
                     token: joi_validators.nanoid.required(),
                     admin_token: joi_validators.nanoid.required(),
+                }),
+            },
+        },
+    });
+
+    server.route({
+        method: 'GET',
+        path: '/meet/admin',
+        handler: require('./handlers/bbb/ui').adminUi,
+    });
+    server.route({
+        method: 'POST',
+        path: '/meet/admin/create',
+        handler: require('./handlers/bbb/api').createRoom,
+        options: {
+            validate: {
+                payload: Joi.object({
+                    room_name: Joi.string().max(150).required(),
+                    slug: Joi.string()
+                        .pattern(/^[a-z0-9-_]+$/i)
+                        .max(50)
+                        .required(),
+                    welcome_message: Joi.string(),
+                    additional_params: Joi.string()
+                        .custom((val) => {
+                            new URLSearchParams(val);
+                            return val;
+                        }, 'URLSearchParams validation')
+                        .allow(''),
+                    admin_only: joi_validators.html_checkbox,
+                    anonymous_users_can_start: joi_validators.html_checkbox,
+                    anonymous_users_join_as_guest: joi_validators.html_checkbox,
+                }),
+            },
+        },
+    });
+    server.route({
+        method: 'GET',
+        path: '/meet/join/{lang}/{slug}',
+        handler: require('./handlers/bbb/api').joinRoom,
+        options: {
+            validate: {
+                params: Joi.object({
+                    lang: Joi.string().valid('de', 'en').required(),
+                    slug: Joi.string().required(),
+                }),
+                query: Joi.object({
+                    name: Joi.string().max(50).allow(''),
+                }),
+            },
+        },
+    });
+    server.route({
+        method: 'POST',
+        path: '/meet/admin/delete',
+        handler: require('./handlers/bbb/api').deleteRoom,
+        options: {
+            validate: {
+                payload: Joi.object({
+                    slug: Joi.string().required(),
                 }),
             },
         },
