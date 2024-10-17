@@ -13,4 +13,9 @@ const alpha2_country = Joi.string().valid(
 // An underapproximation of the characters allowed when ordering a Warenpost International stamp from Deutsche Post.
 const post_string = Joi.string().pattern(/^[A-Za-z0-9äöüÄÖÜß.,;\-/()+ ]+$/);
 
-module.exports = { github_user, nanoid, alpha2_country, post_string };
+const html_checkbox = Joi.alternatives()
+    .try(Joi.boolean(), Joi.string())
+    .custom((value) => !!value, 'checkbox validation')
+    .default(false);
+
+module.exports = { github_user, nanoid, alpha2_country, post_string, html_checkbox };

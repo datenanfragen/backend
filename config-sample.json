@@ -38,5 +38,10 @@
         "sender": "Datenanfragen.de Hacktoberfest <noreply@mail.datenanfragen.de>",
         "reply_to_email": "hacktoberfest@datenanfragen.de",
         "github_token": "TOKEN"
+    },
+    "bbb": {
+        "api_url": "https://call.me.tld/bigbluebutton/api/",
+        "api_key": "c9a5a6878d97b48cc965c1e41859f034",
+        "admin_token": "c2f7805face4f01b9554d31c76ba76f9"
     }
 }

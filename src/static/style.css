@@ -32,8 +32,8 @@ h3 {
     font-size: 1.2em;
 }
 
-a,
-a:visited {
+a:not(.button),
+a:not(.button):visited {
     transition: all 0.3s ease;
     position: relative;
     color: #00826c;
@@ -44,8 +44,8 @@ a:visited {
     background-size: 100% 2px;
 }
 
-a:hover,
-a:active {
+a:not(.button):hover,
+a:not(.button):active {
     color: #fff;
     background-size: 100% 100%;
 }
@@ -60,6 +60,11 @@ header {
     clear: both;
 }
 
+.col30 {
+    width: 30%;
+    flex: 0.3;
+    float: left;
+}
 .col40 {
     width: 40%;
     flex: 0.4;
@@ -68,6 +73,11 @@ header {
 .col60 {
     width: 60%;
     flex: 0.6;
+    float: left;
+}
+.col70 {
+    width: 70%;
+    flex: 0.7;
     float: left;
 }
 
@@ -84,6 +94,8 @@ header {
     color: #214192;
     display: inline-block;
     line-height: 1.2;
+    font-size: 16px;
+    font-family: 'Fira Sans', sans-serif;
 }
 .button:hover,
 .button:focus {
@@ -102,8 +114,13 @@ a.button-primary {
     margin-top: 5px;
     margin-bottom: 5px;
 }
+.form-element-help {
+    font-size: 0.8em;
+    margin: 0;
+}
 input,
-select {
+select,
+textarea {
     border: 2px solid #214192;
     border-radius: 2px;
     padding: 7px;
@@ -125,6 +142,12 @@ select:required {
         no-repeat right;
     padding-right: 20px;
     box-shadow: none !important;
+}
+textarea.form-element {
+    appearance: none;
+    line-height: 1.6;
+    max-width: 100%;
+    min-width: 100%;
 }
 select:required {
     background-position-x: right 30px;
@@ -151,10 +174,44 @@ select:required {
     color: #214192;
     z-index: -1;
 }
+input[type='checkbox'].form-element {
+    width: auto;
+    appearance: none;
+    border: 2px solid #214192;
+    cursor: auto;
+    float: left;
+    margin: 0 10px 0 0;
+    padding: 10px;
+}
+input[type='checkbox'].form-element:checked {
+    background: linear-gradient(#214192, #214192) 50%/16px 16px;
+    background-position-x: 50%;
+    background-position-y: center;
+    background-repeat: repeat;
+    background-position: 50%;
+    background-repeat: no-repeat;
+}
 
 .box {
     box-sizing: border-box;
     border: 4px solid #214192;
     border-radius: 2px;
     padding: 20px;
+}
+.box-error {
+    border-color: #c53030;
+}
+.box-warning {
+    border-color: #f6ae55;
+}
+.box-info {
+    border-color: #bfd8f0;
+}
+.box-success {
+    border-color: #9ae6b5;
+}
+
+pre {
+    white-space: pre-wrap;
+    word-break: break-all;
 }

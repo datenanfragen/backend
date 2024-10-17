@@ -1,0 +1,20 @@
+<h1>Login</h1>
+
+<p>To use the admin interface, you need to login using your token.</p>
+
+<div class="form-group">
+    <div class="col40"><strong><label for="bbb_admin_token">Token</label></strong></div>
+    <div class="col60"><input type="text" id="bbb_admin_token" name="bbb_admin_token" class="form-element"></div>
+    <div class="clearfix" style="margin-bottom: 50px"></div>
+
+    <button class="button button-primary" id="submitButton">Login</button>
+</div>
+
+<script>
+document.getElementById('submitButton').addEventListener('click', function() {
+    const token = document.getElementById('bbb_admin_token').value;
+
+    document.cookie = `bbb_admin_token=${token};expires=${new Date(Date.now() + 1000 * 60 * 60 * 24 * 365).toUTCString()};secure`;
+    window.location.reload();
+});
+</script>
