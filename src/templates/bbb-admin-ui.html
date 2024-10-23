@@ -1,0 +1,85 @@
+<h1>{{title}}</h1>
+
+{{#if create_success}}
+<div class="box box-success">Meeting created successfully!</div>
+{{/if}}
+{{#if delete_success}}
+<div class="box box-success">Meeting deleted successfully!</div>
+{{/if}}
+{{#if delete_error}}
+<div class="box box-error">Meeting deletion failed: {{delete_error}}</div>
+{{/if}}
+{{#if create_error}}
+<div class="box box-error">Meeting creation failed: {{create_error}}</div>
+{{/if}}
+
+<h2>Create a new meeting</h2>
+
+<div class="form-group">
+    <form action="/meet/admin/create" method="post">
+        <div class="col30"><label for="room_name">Room name</label></div>
+        <div class="col70"><input type="text" id="room_name" name="room_name" class="form-element" required maxlength="150"></div>
+        <div class="clearfix" style="margin-bottom: 10px"></div>
+
+        <div class="col30"><label for="slug">Slug</label></div>
+        <div class="col70"><input type="text" id="slug" name="slug" class="form-element" required pattern="^[a-zA-Z0-9-_]+$" maxlength="50"></div>
+        <div class="clearfix" style="margin-bottom: 10px"></div>
+
+        <div class="col30"><label for="welcome_message">Welcome message</label></div>
+        <div class="col70">
+            <textarea id="welcome_message" name="welcome_message" class="form-element" rows="5" aria-describedby="welcome_message-help">Willkommen im Raum „%%CONFNAME%%“.
+<br><br>
+Welcome to “%%CONFNAME%%”.</textarea>
+            <p id="welcome_message-help" class="form-element-help">You can use the following variables: <code>%%CONFNAME%%</code>, <code>%%DIALNUM%%</code>, <code>%%CONFNUM%%</code></p>
+        </div>
+        <div class="clearfix" style="margin-bottom: 10px"></div>
+
+        <div class="col30"><label for="additional_params">Additional parameters</label></div>
+        <div class="col70">
+            <textarea id="additional_params" name="additional_params" class="form-element" rows="7" aria-describedby="additional_params-help">muteOnStart=true&logoutURL=https://www.datenanfragen.de/verein/event/&moderatorOnlyMessage=Dial%20in%20using%20%25%25DIALNUM%25%25%20and%20%25%25CONFNUM%25%25</textarea>
+            <p id="additional_params-help" class="form-element-help">Provide the parameters in URL query string format. Check the <a href="https://docs.bigbluebutton.org/development/api/#get-post-create" target="_blank">BBB API docs</a> for a full list of available parameters.</p>
+        </div>
+        <div class="clearfix" style="margin-bottom: 10px"></div>
+
+        <div style="margin-bottom: 10px">
+            <input type="checkbox" id="admin_only" name="admin_only" class="form-element">
+            <label for="admin_only">Only allow admins to join</label>
+        </div>
+
+        <div style="margin-bottom: 10px">
+            <input type="checkbox" id="anonymous_users_can_start" name="anonymous_users_can_start" class="form-element">
+            <label for="anonymous_users_can_start">Anonymous users can start the meeting</label>
+        </div>
+
+        <div style="margin-bottom: 10px">
+            <input type="checkbox" id="anonymous_users_join_as_guest" name="anonymous_users_join_as_guest" class="form-element">
+            <label for="anonymous_users_join_as_guest">Anonymous users join as guest</label>
+        </div>
+
+        <button class="button button-primary">Create meeting</button>
+    </form>
+</div>
+
+<h2>Meetings</h2>
+
+{{#unless meetings.length}}
+<div class="box box-info">No meetings created yet.</div>
+{{/unless}}
+
+{{#each meetings}}
+<h3><code>{{slug}}</code></h3>
+<pre>
+{{jsonify this}}
+</pre>
+<form action="/meet/admin/delete" method="post" onclick="return confirm('Are you sure you want to delete the meeting {{slug}}?');" style="display: inline;">
+    <input type="hidden" name="slug" value="{{slug}}">
+    <button class="button button-secondary" type="submit">Delete meeting {{slug}}</button>
+</form>
+<a class="button button-secondary" href="/meet/join/en/{{slug}}">Join meeting {{slug}}</a>
+{{/each}}
+
+<h2>Debug information</h2>
+
+Below is the output from the <code>getMeetings</code> endpoint of the BBB API. Remember that meetings are only created through the API once someone has joined, <strong>not</strong> if you create them through the UI above.
+
+<pre>{{jsonify api_meetings}}</pre>
