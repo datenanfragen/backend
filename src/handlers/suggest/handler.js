@@ -75,9 +75,10 @@ async function suggest(request, h) {
                             body: `This suggestion was submitted through the website.
 
 **Edit in: [company JSON generator](https://company-json.datenanfragen.de/#!url=${encodeURIComponent(
-                                `https://raw.githubusercontent.com/${config.suggest.token_owner}/${config.suggest.repo}/${branch_name}/${file_path}), [data editor](https://data-editor.datenanfragen.de/#/review/${pr.data.number})`
-                            )}[^1]**
-                            [^1]: Closed beta`,
+                                `https://raw.githubusercontent.com/${config.suggest.token_owner}/${config.suggest.repo}/${branch_name}/${file_path})`
+                            )}, [data editor](https://data-editor.datenanfragen.de/#/review/${pr.data.number})[^1]**
+
+[^1]: Closed beta`,
 
                             maintainer_can_modify: true, // We cannot set this setting through the plugin, but because it is just a gimmick, we can do it afterwards just as well.
                         })
