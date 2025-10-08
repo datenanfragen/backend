@@ -43,5 +43,9 @@
         "api_url": "https://call.me.tld/bigbluebutton/api/",
         "api_key": "c9a5a6878d97b48cc965c1e41859f034",
         "admin_token": "c2f7805face4f01b9554d31c76ba76f9"
+    },
+    "conduct": {
+        "sender": "Datenanfragen.de CoC report <noreply@mail.datenanfragen.de>",
+        "recipients": "conduct@datenanfragen.de"
     }
 }

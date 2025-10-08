@@ -349,6 +349,23 @@ const init = async () => {
 
     server.route({
         method: 'POST',
+        path: '/report-misconduct',
+        handler: require('./handlers/conduct/report-misconduct'),
+        options: {
+            validate: {
+                payload: Joi.object({
+                    encryptedMessage: Joi.string()
+                        .pattern(/^\s*-----BEGIN PGP MESSAGE-----/)
+                        .pattern(/-----END PGP MESSAGE-----\s*$/)
+                        .max(10000000)
+                        .required(),
+                }),
+            },
+        },
+    });
+
+    server.route({
+        method: 'POST',
         path: '/cron/garbageCollect',
         handler: require('./handlers/cron/garbageCollect'),
     });
