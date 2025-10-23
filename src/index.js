@@ -130,6 +130,7 @@ const init = async () => {
                         .required()
                         .unknown()
                         .or('name', 'web'),
+                    comment: Joi.string().max(10000).allow(''),
                 }),
                 failAction: async (request, h, err) => {
                     if (
