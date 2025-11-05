@@ -96,7 +96,11 @@ async function suggest(request, h) {
                                 issue_number: pr.data.number,
                                 body:
                                     'The submitter left the following additional comment:\n\n' +
-                                    request.payload.comment,
+                                    request.payload.comment
+                                        .trim()
+                                        .split('\n')
+                                        .map((l) => '> ' + l)
+                                        .join('\n'),
                             })
                     )
                     .then(() =>
