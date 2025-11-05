@@ -83,6 +83,26 @@ async function suggest(request, h) {
                             maintainer_can_modify: true, // We cannot set this setting through the plugin, but because it is just a gimmick, we can do it afterwards just as well.
                         })
                     )
+                    .then(
+                        () =>
+                            request.payload.comment &&
+                            request.payload.comment.length > 0 &&
+                            // Submitting a separate comment has two advantages over adding this to the PR body:
+                            // 1. It is more visible (especially in data-editor).
+                            // 2. It can be deleted much more easily if necessary.
+                            octokit.issues.createComment({
+                                owner: config.suggest.owner,
+                                repo: config.suggest.repo,
+                                issue_number: pr.data.number,
+                                body:
+                                    'The submitter left the following additional comment:\n\n' +
+                                    request.payload.comment
+                                        .trim()
+                                        .split('\n')
+                                        .map((l) => '> ' + l)
+                                        .join('\n'),
+                            })
+                    )
                     .then(() =>
                         octokit.issues.addLabels({
                             owner: config.suggest.owner,
