@@ -184,12 +184,14 @@ const init = async () => {
     server.route({
         method: 'GET',
         path: '/meet/admin',
-        handler: require('./handlers/bbb/ui').adminUi,
+        handler: (_, h) => h.response().code(503),
+        //handler: require('./handlers/bbb/ui').adminUi,
     });
     server.route({
         method: 'POST',
         path: '/meet/admin/create',
-        handler: require('./handlers/bbb/api').createRoom,
+        handler: (_, h) => h.response().code(503),
+        //handler: require('./handlers/bbb/api').createRoom,
         options: {
             validate: {
                 payload: Joi.object({
@@ -215,7 +217,8 @@ const init = async () => {
     server.route({
         method: 'GET',
         path: '/meet/join/{lang}/{slug}',
-        handler: require('./handlers/bbb/api').joinRoom,
+        handler: (_, h) => h.response().code(503),
+        //handler: require('./handlers/bbb/api').joinRoom,
         options: {
             validate: {
                 params: Joi.object({
@@ -231,7 +234,8 @@ const init = async () => {
     server.route({
         method: 'POST',
         path: '/meet/admin/delete',
-        handler: require('./handlers/bbb/api').deleteRoom,
+        handler: (_, h) => h.response().code(503),
+        //handler: require('./handlers/bbb/api').deleteRoom,
         options: {
             validate: {
                 payload: Joi.object({
