@@ -6,7 +6,7 @@
     "author": "The Datenanfragen.de project <dev@datenanfragen.de> (https://www.datenanfragen.de)",
     "license": "MIT",
     "engines": {
-        "node": ">=18"
+        "node": ">=26"
     },
     "devDependencies": {
         "husky": "4.3.7",
