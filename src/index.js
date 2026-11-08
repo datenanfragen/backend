@@ -289,7 +289,7 @@ process.on('unhandledRejection', (err) => {
 
 try {
     require('../config.json');
-} catch (_) {
+} catch {
     console.error(
         'Invalid or missing configuration. Please copy `config-sample.json` to `config.json` and change the values as needed.'
     );
