@@ -4,7 +4,6 @@ const Boom = require('@hapi/boom');
 const path = require('path');
 const knex = require('knex').knex(require('../knexfile').development);
 const joi_validators = require('./util/joi');
-const joi = require('./util/joi');
 
 const init = async () => {
     const server = Hapi.server({
@@ -161,34 +160,16 @@ const init = async () => {
     server.route({
         method: 'POST',
         path: '/donation',
-        handler: require('./handlers/donation/post'),
-        options: {
-            validate: {
-                payload: Joi.object({
-                    method: Joi.string().valid('mollie', 'creditcard', 'cryptocurrency').required(),
-                    amount: Joi.string()
-                        .pattern(/^[0-9]+\.[0-9]{2}$/)
-                        .required(),
-                    description: Joi.string(),
-                    reference: Joi.string().required(),
-                    redirect_base: Joi.string()
-                        .required()
-                        .pattern(/^https:\/\/.+/),
-                }),
-            },
+        handler: (_, h) => {
+            return h.response().code(410); // 410 - gone
         },
     });
 
     server.route({
         method: 'GET',
         path: '/donation/state/{reference*}',
-        handler: require('./handlers/donation/state'),
-        options: {
-            validate: {
-                params: Joi.object({
-                    reference: Joi.string().required(),
-                }),
-            },
+        handler: (_, h) => {
+            return h.response().code(410); // 410 - gone
         },
     });
 

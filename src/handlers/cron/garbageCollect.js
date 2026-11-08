@@ -3,8 +3,6 @@ const config = require('../../../config.json');
 async function garbageCollect(request, h) {
     let commentLifetime = new Date();
     commentLifetime.setDate(commentLifetime.getDate() - config.comments.retention_days);
-    let donationLifetime = new Date();
-    donationLifetime.setDate(donationLifetime.getDate() - config.donation.retention_days);
 
     try {
         await request.server.methods
@@ -12,8 +10,6 @@ async function garbageCollect(request, h) {
             .where('added_at', '<', commentLifetime.toISOString())
             .andWhere('is_accepted', false)
             .del();
-
-        await request.server.methods.knex('mollie_ids').where('added_at', '<', donationLifetime.toISOString()).del();
 
         return {
             message: 'Garbage collection completed sucessfully.',

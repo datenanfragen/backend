@@ -6,7 +6,6 @@
         "smtp_user": "johnny",
         "smtp_password": "hunter2"
     },
-
     "comments": {
         "service_url": "https://server.tld/comments",
         "token_sender": "comments@server.tld",
@@ -20,19 +19,6 @@
         "branch": "master",
         "github_token": "TOKEN",
         "token_owner": "datenanfragen-community-edits"
-    },
-    "donation": {
-        "mollie": {
-            "api_key": "test_SECRET",
-            "endpoint": "https://api.mollie.com/v2/payments",
-            "other_methods": ["sofort", "giropay", "eps", "bancontact", "ideal", "kbc", "belfius", "inghomepay"]
-        },
-        "coingate": {
-            "api_key": "ALSO_$3Cr3t",
-            "endpoint": "https://api.coingate.com/v2/orders"
-        },
-        "currency": "EUR",
-        "retention_days": 14
     },
     "bbb": {
         "api_url": "https://call.me.tld/bigbluebutton/api/",
