@@ -4,7 +4,6 @@ const Boom = require('@hapi/boom');
 const path = require('path');
 const knex = require('knex').knex(require('../knexfile').development);
 const joi_validators = require('./util/joi');
-const joi = require('./util/joi');
 
 const init = async () => {
     const server = Hapi.server({
@@ -161,130 +160,24 @@ const init = async () => {
     server.route({
         method: 'POST',
         path: '/donation',
-        handler: require('./handlers/donation/post'),
-        options: {
-            validate: {
-                payload: Joi.object({
-                    method: Joi.string().valid('mollie', 'creditcard', 'cryptocurrency').required(),
-                    amount: Joi.string()
-                        .pattern(/^[0-9]+\.[0-9]{2}$/)
-                        .required(),
-                    description: Joi.string(),
-                    reference: Joi.string().required(),
-                    redirect_base: Joi.string()
-                        .required()
-                        .pattern(/^https:\/\/.+/),
-                }),
-            },
+        handler: (_, h) => {
+            return h.response().code(410); // 410 - gone
         },
     });
 
     server.route({
         method: 'GET',
         path: '/donation/state/{reference*}',
-        handler: require('./handlers/donation/state'),
-        options: {
-            validate: {
-                params: Joi.object({
-                    reference: Joi.string().required(),
-                }),
-            },
+        handler: (_, h) => {
+            return h.response().code(410); // 410 - gone
         },
     });
 
     server.route({
-        method: 'POST',
-        path: '/hacktoberfest',
-        handler: require('./handlers/hacktoberfest/register'),
-        options: {
-            validate: {
-                payload: Joi.object({
-                    github_user: joi_validators.github_user.required(),
-                    email: Joi.string().email().required(),
-                    accept_terms: Joi.string().valid('on').required(),
-                    accept_us_transfers: Joi.string().valid('on').required(),
-                    language: Joi.string().valid('de', 'en').required(),
-                    year: Joi.string().valid('2020', '2021').required(),
-                }),
-                failAction: async (request, h, err) => {
-                    const redirect_domain = request.payload.language === 'de' ? 'datenanfragen.de' : 'datarequests.org';
-                    return h
-                        .redirect(`https://www.${redirect_domain}/blog/hacktoberfest-2020#!error=validation`)
-                        .takeover();
-                },
-            },
-        },
-    });
-    server.route({
-        method: 'GET',
-        path: '/hacktoberfest/address/{github_user}/{token}',
-        handler: require('./handlers/hacktoberfest/submit-address').submitAddressForm,
-        options: {
-            validate: {
-                params: Joi.object({
-                    github_user: joi_validators.github_user.required(),
-                    token: joi_validators.nanoid.required(),
-                }),
-            },
-        },
-    });
-    server.route({
-        method: 'POST',
-        path: '/hacktoberfest/address',
-        handler: require('./handlers/hacktoberfest/submit-address').submitAddress,
-        options: {
-            validate: {
-                payload: Joi.object({
-                    // prettier-ignore
-                    size: Joi.string()
-                        .valid('unisex-xs', 'unisex-s', 'unisex-m', 'unisex-l', 'unisex-xl', 'unisex-2xl', 'unisex-3xl', 'unisex-4xl', 'unisex-5xl', 'tapered-xs', 'tapered-s', 'tapered-m', 'tapered-l', 'tapered-xl', 'tapered-2xl', 'tapered-3xl'),
-
-                    name: joi_validators.post_string.max(30).required(),
-                    additional1: joi_validators.post_string.max(40).allow(''),
-                    additional2: joi_validators.post_string.max(40).allow(''),
-                    street: joi_validators.post_string.max(40).required(),
-                    zip: joi_validators.post_string.max(20).required(),
-                    city: joi_validators.post_string.max(30).required(),
-                    additional3: joi_validators.post_string.max(20).allow(''),
-                    country: joi_validators.alpha2_country.required(),
-
-                    phone: Joi.string()
-                        .pattern(/^[0-9 +]+$/)
-                        .max(15)
-                        .allow(''),
-                    email: Joi.string().email().max(50).allow(''),
-
-                    github_user: joi_validators.github_user.required(),
-                    token: joi_validators.nanoid.required(),
-                    language: Joi.string().valid('de', 'en').required(),
-                }),
-            },
-        },
-    });
-    server.route({
-        method: 'GET',
-        path: '/hacktoberfest/address/{language}/success',
-        handler: require('./handlers/hacktoberfest/submit-address').confirmation,
-        options: {
-            validate: {
-                params: Joi.object({
-                    language: Joi.string().valid('de', 'en').required(),
-                }),
-            },
-        },
-    });
-    server.route({
-        method: 'GET',
-        path: '/hacktoberfest/send/{github_user}/{token}/{admin_token}',
-        handler: require('./handlers/hacktoberfest/submit-address').markSent,
-        options: {
-            validate: {
-                params: Joi.object({
-                    github_user: joi_validators.github_user.required(),
-                    token: joi_validators.nanoid.required(),
-                    admin_token: joi_validators.nanoid.required(),
-                }),
-            },
+        method: ['GET', 'POST'],
+        path: '/hacktoberfest/{anything?}',
+        handler: (_, h) => {
+            return h.response().code(410); // 410 - gone
         },
     });
 
@@ -396,7 +289,7 @@ process.on('unhandledRejection', (err) => {
 
 try {
     require('../config.json');
-} catch (_) {
+} catch {
     console.error(
         'Invalid or missing configuration. Please copy `config-sample.json` to `config.json` and change the values as needed.'
     );
