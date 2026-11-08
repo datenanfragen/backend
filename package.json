@@ -15,6 +15,7 @@
         "prettier": "^2.8.8"
     },
     "dependencies": {
+        "@hapi/boom": "^10.0.1",
         "@hapi/hapi": "^21.3.2",
         "@hapi/inert": "^7.1.0",
         "@hapi/vision": "^7.0.1",
