@@ -1,6 +1,6 @@
-const { test, describe, before, after, beforeEach, afterEach } = require('node:test');
-const assert = require('node:assert/strict');
-const { init } = require('../src/server');
+import { test, describe, before, after, beforeEach, afterEach } from 'node:test';
+import assert, { strictEqual } from 'node:assert/strict';
+import { init } from '../src/server.ts';
 
 describe('Basic Tests', (t) => {
     let server;
@@ -16,7 +16,7 @@ describe('Basic Tests', (t) => {
             method: 'get',
             url: '/',
         });
-        assert.strictEqual(res.statusCode, 200);
+        strictEqual(res.statusCode, 200);
         assert(res.result.includes('You have reached one of the servers running in the background'));
     });
 });

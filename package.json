@@ -3,17 +3,24 @@
     "version": "1.0.0",
     "private": true,
     "description": "While Datenanfragen.de is mostly run as a static site, some functionality does require a server. These endpoints are defined here.",
-    "author": "The Datenanfragen.de project <dev@datenanfragen.de> (https://www.datenanfragen.de)",
     "license": "MIT",
-    "engines": {
-        "node": ">=22"
+    "author": "The Datenanfragen.de project <dev@datenanfragen.de> (https://www.datenanfragen.de)",
+    "type": "module",
+    "scripts": {
+        "dev": "nodemon -e js,mjs,ts,mts,json,html src/index.ts",
+        "prod": "pm2 startOrRestart ecosystem.config.json --no-daemon"
     },
-    "devDependencies": {
-        "husky": "4.3.7",
-        "lint-staged": "^13.2.2",
-        "nodemon": "^3.1.14",
-        "prettier": "^2.8.8"
+    "husky": {
+        "hooks": {
+            "pre-commit": "lint-staged"
+        }
     },
+    "lint-staged": {
+        "*.{js,css,scss,json}": [
+            "prettier --write"
+        ]
+    },
+    "prettier": "@baltpeter/prettier-config",
     "dependencies": {
         "@hapi/boom": "^10.0.1",
         "@hapi/hapi": "^21.4.13",
@@ -28,21 +35,20 @@
         "nanoid": "3.3.8",
         "nodemailer": "^7.0.11",
         "octokit-plugin-create-pull-request": "^4.2.2",
-        "pm2": "^5.3.0",
+        "pm2": "^7.1.2",
         "sqlite3": "^6.0.1"
     },
-    "scripts": {
-        "dev": "nodemon -e js,mjs,json,html src/index.js",
-        "prod": "pm2 startOrRestart ecosystem.config.js --no-daemon"
+    "devDependencies": {
+        "@baltpeter/prettier-config": "^3.0.0",
+        "@types/node": "^26.6.6",
+        "@types/nodemailer": "^8.0.2",
+        "husky": "4.3.7",
+        "lint-staged": "^13.2.2",
+        "nodemon": "^3.1.14",
+        "prettier": "^3.9.10",
+        "typescript": "^7.0.2"
     },
-    "husky": {
-        "hooks": {
-            "pre-commit": "lint-staged"
-        }
-    },
-    "lint-staged": {
-        "*.{js,css,scss,json}": [
-            "prettier --write"
-        ]
+    "engines": {
+        "node": ">=22"
     }
 }

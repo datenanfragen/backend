@@ -1,11 +1,15 @@
-const config = require('../../../config.json');
-const { generateReference, stripTags } = require('../../util/functions');
-const { transporter } = require('../../util/email');
+import type { HapiHandler } from '../../util/types.ts';
 
-async function reportMisconduct(request, h) {
+import config from '../../../config.json' with { type: 'json' };
+import { generateReference, stripTags } from '../../util/functions.ts';
+import { transporter } from '../../util/email.ts';
+
+export const reportMisconduct: HapiHandler = async (request, h) => {
+    const { encryptedMessage } = request.payload as { encryptedMessage: string };
+
     const now = new Date();
     const reference = generateReference(now);
-    const text = stripTags(request.payload.encryptedMessage);
+    const text = stripTags(encryptedMessage);
 
     return await transporter
         .sendMail({
@@ -17,10 +21,8 @@ async function reportMisconduct(request, h) {
         .then(() => ({
             message: 'Report sent successfully.',
         }))
-        .catch((e) => {
+        .catch((e: Error) => {
             console.error(e);
             return h.response({ message: 'Error while sending report.' }).code(500);
         });
-}
-
-module.exports = reportMisconduct;
+};

@@ -1,9 +1,23 @@
-const Hapi = require('@hapi/hapi');
-const Joi = require('joi');
-const Boom = require('@hapi/boom');
-const path = require('path');
-const knex = require('knex').knex(require('../knexfile').development);
-const joi_validators = require('./util/joi');
+import Hapi from '@hapi/hapi';
+import Joi, { type ValidationError } from 'joi';
+import Boom from '@hapi/boom';
+import { join } from 'node:path';
+import Inert from '@hapi/inert';
+import Vision from '@hapi/vision';
+import Knex from './plugins/knex.ts';
+// @ts-expect-error hapi-cron has no type definitions.
+import Cron from 'hapi-cron';
+import { html_checkbox } from './util/joi.ts';
+import Handlebars from 'handlebars';
+import { readFile } from 'node:fs/promises';
+import { createRoom, deleteRoom, joinRoom } from './handlers/bbb/api.ts';
+import { adminUi } from './handlers/bbb/ui.ts';
+import { acceptComment } from './handlers/comments/acceptComment.ts';
+import { getComments } from './handlers/comments/getComments.ts';
+import { putComment } from './handlers/comments/putComment.ts';
+import { reportMisconduct } from './handlers/conduct/report-misconduct.ts';
+import { garbageCollect } from './handlers/cron/garbageCollect.ts';
+import { suggest } from './handlers/suggest/suggest.ts';
 
 const server = Hapi.server({
     port: 3000,
@@ -11,13 +25,13 @@ const server = Hapi.server({
     routes: {
         cors: true,
         files: {
-            relativeTo: path.join(__dirname, 'static'),
+            relativeTo: join(import.meta.dirname, 'static'),
         },
         validate: {
             // taken from: https://github.com/hapijs/hapi/issues/3706#issuecomment-349765943
             failAction: async (request, h, err) => {
                 if (process.env.NODE_ENV === 'production') {
-                    console.error('ValidationError:', err.message);
+                    console.error('ValidationError:', err?.message);
                     throw Boom.badRequest(`Invalid request payload input`);
                 } else {
                     console.error(err);
@@ -28,13 +42,13 @@ const server = Hapi.server({
     },
 });
 
-const init = async () => {
+export const init = async () => {
     // For serving static files.
-    await server.register(require('@hapi/inert'));
+    await server.register(Inert);
     // For template rendering support.
-    await server.register(require('@hapi/vision'));
+    await server.register(Vision);
     // Expose the database to the routes.
-    server.method('knex', knex);
+    await server.register(Knex);
 
     // Configure the cookie for administering BBB.
     server.state('bbb_admin_token', {
@@ -47,7 +61,7 @@ const init = async () => {
     });
 
     await server.register({
-        plugin: require('hapi-cron'),
+        plugin: Cron,
         options: {
             jobs: [
                 {
@@ -58,7 +72,7 @@ const init = async () => {
                         method: 'POST',
                         url: '/cron/garbageCollect',
                     },
-                    onComplete: (res) => {
+                    onComplete: (res: { message: string }) => {
                         console.log('cron:', res.message);
                     },
                 },
@@ -67,9 +81,9 @@ const init = async () => {
     });
 
     const view_manager = server.views({
-        engines: { html: require('handlebars') },
+        engines: { html: Handlebars },
         layout: true,
-        relativeTo: __dirname,
+        relativeTo: import.meta.dirname,
         path: 'templates',
         layoutPath: 'templates/layout',
     });
@@ -78,7 +92,7 @@ const init = async () => {
     server.route({
         method: 'PUT',
         path: '/comments',
-        handler: require('./handlers/comments/putComment'),
+        handler: putComment,
         options: {
             validate: {
                 payload: Joi.object({
@@ -92,12 +106,12 @@ const init = async () => {
     server.route({
         method: 'GET',
         path: '/comments/accept/{id}/{token}',
-        handler: require('./handlers/comments/acceptComment'),
+        handler: acceptComment,
     });
     server.route({
         method: 'GET',
         path: '/comments/{action}/{target*}',
-        handler: require('./handlers/comments/getComments'),
+        handler: getComments,
         options: {
             validate: {
                 params: Joi.object({
@@ -111,7 +125,7 @@ const init = async () => {
     server.route({
         method: 'PUT',
         path: '/suggest',
-        handler: require('./handlers/suggest/handler'),
+        handler: suggest,
         options: {
             validate: {
                 payload: Joi.object({
@@ -132,14 +146,18 @@ const init = async () => {
                         .or('name', 'web'),
                     comment: Joi.string().max(10000).allow(''),
                 }),
-                failAction: async (request, h, err) => {
+                failAction: async (request, h, _err) => {
+                    if (!_err) throw new Error('No err in failAction. This should never happen.');
+
+                    const err = _err as ValidationError;
+
                     if (
                         (err.details[0].type === 'object.missing' &&
-                            err.details[0].context.peersWithLabels.includes('name')) ||
-                        err.details[0].context.key === 'slug'
+                            err.details[0].context?.peersWithLabels.includes('name')) ||
+                        err.details[0].context?.key === 'slug'
                     ) {
                         const error = Boom.badRequest(
-                            `NameOrWebMissing: You need to provide either a name or web attribute.`
+                            `NameOrWebMissing: You need to provide either a name or web attribute.`,
                         );
                         error.output.payload.path = err.details[0].path;
                         throw error;
@@ -186,13 +204,13 @@ const init = async () => {
         method: 'GET',
         path: '/meet/admin',
         handler: (_, h) => h.response().code(503),
-        //handler: require('./handlers/bbb/ui').adminUi,
+        // handler: adminUi,
     });
     server.route({
         method: 'POST',
         path: '/meet/admin/create',
         handler: (_, h) => h.response().code(503),
-        //handler: require('./handlers/bbb/api').createRoom,
+        // handler: createRoom,
         options: {
             validate: {
                 payload: Joi.object({
@@ -208,9 +226,9 @@ const init = async () => {
                             return val;
                         }, 'URLSearchParams validation')
                         .allow(''),
-                    admin_only: joi_validators.html_checkbox,
-                    anonymous_users_can_start: joi_validators.html_checkbox,
-                    anonymous_users_join_as_guest: joi_validators.html_checkbox,
+                    admin_only: html_checkbox,
+                    anonymous_users_can_start: html_checkbox,
+                    anonymous_users_join_as_guest: html_checkbox,
                 }),
             },
         },
@@ -219,7 +237,7 @@ const init = async () => {
         method: 'GET',
         path: '/meet/join/{lang}/{slug}',
         handler: (_, h) => h.response().code(503),
-        //handler: require('./handlers/bbb/api').joinRoom,
+        // handler: joinRoom,
         options: {
             validate: {
                 params: Joi.object({
@@ -236,7 +254,7 @@ const init = async () => {
         method: 'POST',
         path: '/meet/admin/delete',
         handler: (_, h) => h.response().code(503),
-        //handler: require('./handlers/bbb/api').deleteRoom,
+        // handler: deleteRoom,
         options: {
             validate: {
                 payload: Joi.object({
@@ -249,7 +267,7 @@ const init = async () => {
     server.route({
         method: 'POST',
         path: '/report-misconduct',
-        handler: require('./handlers/conduct/report-misconduct'),
+        handler: reportMisconduct,
         options: {
             validate: {
                 payload: Joi.object({
@@ -266,7 +284,7 @@ const init = async () => {
     server.route({
         method: 'POST',
         path: '/cron/garbageCollect',
-        handler: require('./handlers/cron/garbageCollect'),
+        handler: garbageCollect,
     });
 
     server.route({
@@ -285,17 +303,17 @@ const init = async () => {
     return server;
 };
 
-const start = async () => {
+export const start = async () => {
     await server.start();
     console.log('Server running on', server.info.uri);
     return server;
 };
 
 try {
-    require('../config.json');
+    JSON.parse(await readFile(join(import.meta.dirname, '../config.json'), 'utf-8'));
 } catch {
     console.error(
-        'Invalid or missing configuration. Please copy `config-sample.json` to `config.json` and change the values as needed.'
+        'Invalid or missing configuration. Please copy `config-sample.json` to `config.json` and change the values as needed.',
     );
     process.exit(1);
 }
@@ -306,5 +324,3 @@ process.on('unhandledRejection', (err) => {
     // TODO: We should probably be informed about this somehow.
     process.exit(1);
 });
-
-module.exports = { init, start };

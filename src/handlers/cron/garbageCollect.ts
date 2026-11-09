@@ -1,6 +1,7 @@
-const config = require('../../../config.json');
+import config from '../../../config.json' with { type: 'json' };
+import type { HapiHandler } from '../../util/types.ts';
 
-async function garbageCollect(request, h) {
+export const garbageCollect: HapiHandler = async (request, h) => {
     let commentLifetime = new Date();
     commentLifetime.setDate(commentLifetime.getDate() - config.comments.retention_days);
 
@@ -22,6 +23,4 @@ async function garbageCollect(request, h) {
             })
             .code(500);
     }
-}
-
-module.exports = garbageCollect;
+};
