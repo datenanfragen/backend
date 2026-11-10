@@ -1,35 +1,42 @@
-const config = require('../../../config.json');
-const { stripTags } = require('../../util/functions');
+import type { HapiHandler } from '../../util/types.ts';
 
-async function getComments(request, h) {
+import config from '../../../config.json' with { type: 'json' };
+import { stripTags } from '../../util/functions.ts';
+
+export const getComments: HapiHandler = async (request, h) => {
+    const { target } = request.params as { target: string | undefined };
+
     return await request.server.methods
         .knex('comments')
         .select('id', 'author', 'message', 'target', 'added_at')
-        .where({ is_accepted: true, ...(request.params.target && { target: request.params.target }) })
+        .where({ is_accepted: true, ...(target && { target }) })
         .orderBy('added_at', 'desc')
-        .limit(request.params.target ? Number.MAX_SAFE_INTEGER : config.comments.limit)
+        .limit(target ? Number.MAX_SAFE_INTEGER : config.comments.limit)
         .then((data) => {
             switch (request.params.action) {
                 case 'get':
                     return data;
                 case 'feed':
-                    return h.response(atomFeedForItems(data, request.params.target)).type('application/atom+xml');
+                    return h.response(atomFeedForItems(data, target)).type('application/atom+xml');
             }
         })
         .catch((e) => {
             console.error(e);
             return h.response({ message: 'Fetching the comments failed.' }).code(500);
         });
-}
+};
 
-function atomFeedForItems(items, target) {
+function atomFeedForItems(
+    items: { added_at: string; target: string; message: string; author: string; id: string }[],
+    target: string | undefined,
+) {
     const feed_updated = items.reduce(
         (acc, cur) => (cur.added_at > acc ? cur.added_at : acc),
-        '1970-01-01T00:00:00.000Z'
+        '1970-01-01T00:00:00.000Z',
     );
 
     // Excerpt regex taken from https://stackoverflow.com/a/5454297
-    const excerpt = (str) => str.replace(/\s+/g, ' ').replace(/^(.{40}[^\s]*).*/, '$1');
+    const excerpt = (str: string) => str.replace(/\s+/g, ' ').replace(/^(.{40}[^\s]*).*/, '$1');
     const entries = items.map(
         (item) => `    <entry>
         <title>${!target ? item.target + ': ' : ''}${excerpt(stripTags(item.message))}</title>
@@ -37,7 +44,7 @@ function atomFeedForItems(items, target) {
         <updated>${item.added_at}</updated>
         <author><name>${item.author}</name></author>
         <content type="text">${stripTags(item.message)}</content>
-    </entry>`
+    </entry>`,
     );
 
     return `<?xml version="1.0" encoding="utf-8"?>
@@ -51,5 +58,3 @@ ${entries.join('\n')}
 </feed>
 `;
 }
-
-module.exports = getComments;

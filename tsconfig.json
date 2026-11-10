@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "noEmit": true,
+        "strict": true,
+
+        // Recommended options for Node-native TS, see: https://nodejs.org/api/typescript.html#type-stripping
+        "target": "esnext",
+        "module": "nodenext",
+        "rewriteRelativeImportExtensions": true,
+        "erasableSyntaxOnly": true,
+        "verbatimModuleSyntax": true
+    }
+}

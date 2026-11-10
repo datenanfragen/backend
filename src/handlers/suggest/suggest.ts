@@ -1,6 +1,17 @@
-const config = require('../../../config.json');
-const { Octokit } = require('@octokit/rest');
-const { createPullRequest } = require('octokit-plugin-create-pull-request');
+import config from '../../../config.json' with { type: 'json' };
+import { Octokit } from '@octokit/rest';
+import { createPullRequest } from 'octokit-plugin-create-pull-request';
+import type { HapiHandler } from '../../util/types.ts';
+
+type Company = {
+    slug: string;
+    'relevant-countries': string[];
+    name?: string;
+    web?: string;
+    sources: string[];
+    address?: string;
+    [key: string]: unknown;
+};
 
 const myOctokit = Octokit.plugin(createPullRequest);
 const octokit = new myOctokit({
@@ -8,35 +19,43 @@ const octokit = new myOctokit({
     userAgent: 'Datenanfragen.de suggest-api',
 });
 
-function cleanElement(element) {
+function cleanElement<ElementT>(element: ElementT): ElementT {
     // Trim strings
-    if (typeof element === 'string') return element.trim();
+    if (typeof element === 'string') return element.trim() as ElementT;
 
     // Remove null values from array properties
-    if (Array.isArray(element)) return element.filter(Boolean).map((elem) => cleanElement(elem));
+    if (Array.isArray(element)) return element.filter(Boolean).map((elem) => cleanElement(elem)) as ElementT;
 
     return element;
 }
 
-function cleanCompanyData(company) {
+function cleanCompanyData(company: Company) {
     return Object.fromEntries(
         Object.keys(company)
             // Remove all `null` and `undefined` values & all null values inside array properties
             .filter((key) => company[key] !== null && company[key] !== undefined)
             // Trim all strings
-            .map((key) => [key, cleanElement(company[key])])
-    );
+            .map((key) => [key, cleanElement(company[key])]),
+    ) as Company;
 }
 
-async function suggest(request, h) {
-    let company = cleanCompanyData(request.payload.data);
+export const suggest: HapiHandler = async (request, h) => {
+    const payload = request.payload as {
+        for: 'cdb';
+        new: boolean;
+        data: Company;
+        comment: string;
+    };
+
+    let company = cleanCompanyData(payload.data);
 
     const file_path = `companies/${company.slug}.json`;
-    const files = {};
-    files[file_path] = JSON.stringify(company, null, 4) + '\n';
+    const files = {
+        [file_path]: JSON.stringify(company, null, 4) + '\n',
+    };
 
     const title =
-        (request.payload.new ? `Add '${company.name || company.web}'` : `Update '${company.name || company.slug}'`) +
+        (payload.new ? `Add '${company.name || company.web}'` : `Update '${company.name || company.slug}'`) +
         ' (community contribution)';
     const branch_name = `suggest_${company.slug}_${Date.now()}`;
 
@@ -65,7 +84,7 @@ async function suggest(request, h) {
                     pr.data,
                     file_path,
                     JSON.stringify(company, null, 4) + '\n', // File content
-                    title
+                    title,
                 )
                     .then(() =>
                         octokit.pulls.update({
@@ -75,33 +94,32 @@ async function suggest(request, h) {
                             body: `This suggestion was submitted through the website.
 
 **Edit in: [company JSON generator](https://company-json.datenanfragen.de/#!url=${encodeURIComponent(
-                                `https://raw.githubusercontent.com/${config.suggest.token_owner}/${config.suggest.repo}/${branch_name}/${file_path})`
+                                `https://raw.githubusercontent.com/${config.suggest.token_owner}/${config.suggest.repo}/${branch_name}/${file_path})`,
                             )}, [data editor](https://data-editor.datenanfragen.de/#/review/${pr.data.number})[^1]**
 
 [^1]: Closed beta`,
 
                             maintainer_can_modify: true, // We cannot set this setting through the plugin, but because it is just a gimmick, we can do it afterwards just as well.
-                        })
+                        }),
                     )
-                    .then(
-                        () =>
-                            request.payload.comment &&
-                            request.payload.comment.length > 0 &&
-                            // Submitting a separate comment has two advantages over adding this to the PR body:
-                            // 1. It is more visible (especially in data-editor).
-                            // 2. It can be deleted much more easily if necessary.
-                            octokit.issues.createComment({
-                                owner: config.suggest.owner,
-                                repo: config.suggest.repo,
-                                issue_number: pr.data.number,
-                                body:
-                                    'The submitter left the following additional comment:\n\n' +
-                                    request.payload.comment
-                                        .trim()
-                                        .split('\n')
-                                        .map((l) => '> ' + l)
-                                        .join('\n'),
-                            })
+                    .then(() =>
+                        payload.comment && payload.comment.length > 0
+                            ? // Submitting a separate comment has two advantages over adding this to the PR body:
+                              // 1. It is more visible (especially in data-editor).
+                              // 2. It can be deleted much more easily if necessary.
+                              octokit.issues.createComment({
+                                  owner: config.suggest.owner,
+                                  repo: config.suggest.repo,
+                                  issue_number: pr.data.number,
+                                  body:
+                                      'The submitter left the following additional comment:\n\n' +
+                                      payload.comment
+                                          .trim()
+                                          .split('\n')
+                                          .map((l) => '> ' + l)
+                                          .join('\n'),
+                              })
+                            : undefined,
                     )
                     .then(() =>
                         octokit.issues.addLabels({
@@ -109,7 +127,7 @@ async function suggest(request, h) {
                             repo: config.suggest.repo,
                             issue_number: pr.data.number,
                             labels: ['record', 'via-suggest-api'],
-                        })
+                        }),
                     )
                     .then(() =>
                         h
@@ -119,7 +137,7 @@ async function suggest(request, h) {
                                 url: pr.data.html_url,
                                 issue_url: pr.data.html_url, // legacy support
                             })
-                            .code(201)
+                            .code(201),
                     )
                     .catch((e) => {
                         console.error(e);
@@ -162,16 +180,26 @@ async function suggest(request, h) {
                             url: result.data.html_url,
                             issue_url: result.data.html_url, // legacy support
                         })
-                        .code(201)
+                        .code(201),
                 )
                 .catch((e) => {
                     console.error(e);
                     return h.response({ message: 'Bad Gateway. Failed to create issue.' }).code(502);
                 });
         });
-}
+};
 
-function commitStringFileToPullRequest(owner, repo, pr, path, file_content, commit_message) {
+function commitStringFileToPullRequest(
+    owner: string,
+    repo: string,
+    pr: {
+        head: { ref: string };
+        base: { sha: string };
+    },
+    path: string,
+    file_content: string,
+    commit_message: string,
+) {
     return octokit.git
         .getCommit({
             owner: owner,
@@ -201,7 +229,7 @@ function commitStringFileToPullRequest(owner, repo, pr, path, file_content, comm
                             message: commit_message,
                             tree: tree.data.sha,
                             parents: [commit.data.sha],
-                        })
+                        }),
                     )
                     // Force pushing is actually just updating the reference.
                     .then((new_commit) =>
@@ -211,10 +239,8 @@ function commitStringFileToPullRequest(owner, repo, pr, path, file_content, comm
                             ref: 'heads/' + pr.head.ref,
                             sha: new_commit.data.sha,
                             force: true,
-                        })
+                        }),
                     )
             );
         });
 }
-
-module.exports = suggest;

@@ -1,24 +1,23 @@
-const config = require('../../config.json').bbb;
-const crypto = require('crypto');
-const { XMLParser } = require('fast-xml-parser');
+import config from '../../config.json' with { type: 'json' };
+import crypto from 'crypto';
+import { XMLParser } from 'fast-xml-parser';
 
-if (!config.api_url.endsWith('/')) config.api_url += '/';
+if (!config.bbb.api_url.endsWith('/')) config.bbb.api_url += '/';
 
 const parser = new XMLParser();
 
-/**
- * @param {'create' | 'join' | 'isMeetingRunning' | 'getMeetings' | 'getMeetingInfo'} endpoint
- * @param {URLSearchParams | string} params
- */
-const bbb = async (endpoint, params) => {
+export const bbb = async (
+    endpoint: 'create' | 'join' | 'isMeetingRunning' | 'getMeetings' | 'getMeetingInfo',
+    params?: string | URLSearchParams | Record<string, string>,
+) => {
     const search = new URLSearchParams(params);
-    const checksumString = endpoint + search.toString() + config.api_key;
+    const checksumString = endpoint + search.toString() + config.bbb.api_key;
     const checksum = crypto.createHash('sha1').update(checksumString).digest('hex');
 
     search.set('checksum', checksum);
 
-    const url = new URL(endpoint, config.api_url);
-    url.search = search;
+    const url = new URL(endpoint, config.bbb.api_url);
+    url.search = search.toString();
 
     if (endpoint === 'join') return url.toString();
 
@@ -31,5 +30,3 @@ const bbb = async (endpoint, params) => {
 
     return result;
 };
-
-module.exports = { bbb };

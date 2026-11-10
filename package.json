@@ -3,37 +3,12 @@
     "version": "1.0.0",
     "private": true,
     "description": "While Datenanfragen.de is mostly run as a static site, some functionality does require a server. These endpoints are defined here.",
-    "author": "The Datenanfragen.de project <dev@datenanfragen.de> (https://www.datenanfragen.de)",
     "license": "MIT",
-    "engines": {
-        "node": ">=18"
-    },
-    "devDependencies": {
-        "husky": "4.3.7",
-        "lint-staged": "^13.2.2",
-        "nodemon": "^2.0.22",
-        "prettier": "^2.8.8"
-    },
-    "dependencies": {
-        "@hapi/boom": "^10.0.1",
-        "@hapi/hapi": "^21.3.2",
-        "@hapi/inert": "^7.1.0",
-        "@hapi/vision": "^7.0.1",
-        "@octokit/rest": "^19.0.8",
-        "fast-xml-parser": "^5.3.4",
-        "handlebars": "^4.7.7",
-        "hapi-cron": "^1.1.0",
-        "joi": "^17.9.2",
-        "knex": "^2.4.2",
-        "nanoid": "3.3.8",
-        "nodemailer": "^7.0.11",
-        "octokit-plugin-create-pull-request": "^4.2.2",
-        "pm2": "^5.3.0",
-        "sqlite3": "^5.1.6"
-    },
+    "author": "The Datenanfragen.de project <dev@datenanfragen.de> (https://www.datenanfragen.de)",
+    "type": "module",
     "scripts": {
-        "dev": "nodemon -e js,mjs,json,html src/index.js",
-        "prod": "pm2 startOrRestart ecosystem.config.js --no-daemon"
+        "dev": "nodemon -e js,mjs,ts,mts,json,html src/index.ts",
+        "prod": "pm2 startOrRestart ecosystem.config.json --no-daemon"
     },
     "husky": {
         "hooks": {
@@ -44,5 +19,36 @@
         "*.{js,css,scss,json}": [
             "prettier --write"
         ]
+    },
+    "prettier": "@baltpeter/prettier-config",
+    "dependencies": {
+        "@hapi/boom": "^10.0.1",
+        "@hapi/hapi": "^21.4.13",
+        "@hapi/inert": "^7.1.3",
+        "@hapi/vision": "^7.0.3",
+        "@octokit/rest": "^19.0.8",
+        "fast-xml-parser": "^5.3.4",
+        "handlebars": "^4.7.7",
+        "hapi-cron": "^1.1.0",
+        "joi": "^18.3.2",
+        "knex": "^3.3.0",
+        "nanoid": "3.3.8",
+        "nodemailer": "^7.0.11",
+        "octokit-plugin-create-pull-request": "^4.2.2",
+        "pm2": "^7.1.2",
+        "sqlite3": "^6.0.1"
+    },
+    "devDependencies": {
+        "@baltpeter/prettier-config": "^3.0.0",
+        "@types/node": "^26.6.6",
+        "@types/nodemailer": "^8.0.2",
+        "husky": "4.3.7",
+        "lint-staged": "^13.2.2",
+        "nodemon": "^3.1.14",
+        "prettier": "^3.9.10",
+        "typescript": "^7.0.2"
+    },
+    "engines": {
+        "node": ">=22"
     }
 }

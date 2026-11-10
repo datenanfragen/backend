@@ -1,23 +1,26 @@
-const { nanoid } = require('nanoid');
-const nodemailer = require('nodemailer');
-const config = require('../../../config.json');
-const { stripTags } = require('../../util/functions');
+import { nanoid } from 'nanoid';
+import nodemailer from 'nodemailer';
+import config from '../../../config.json' with { type: 'json' };
+import { stripTags } from '../../util/functions.ts';
+import type { HapiHandler } from '../../util/types.ts';
 
 const successMessage =
     'Successfully added comment. It will need to be accepted by an administrator before it is published.';
 
-async function putComment(request, h) {
+export const putComment: HapiHandler = async (request, h) => {
+    const { message, author, target } = request.payload as { message: string; author: string; target: string };
+
     // Silently drop ridiculously short comments, which are pretty much guaranteed to be spam.
-    if (request.payload.message?.length < 5) return { message: successMessage };
+    if (message?.length < 5) return { message: successMessage };
 
     const service_url =
         config.comments.service_url || `${request.headers['X-Forwarded-Proto']}://${request.headers['Host']}/comments`;
 
     const item = {
         id: nanoid(),
-        author: request.payload.author ? stripTags(request.payload.author).trim() : 'Anonymous',
-        message: request.payload.message.trim(),
-        target: request.payload.target.replace(/[^a-zA-Z0-9/_-]/, '').replace(/^\s*\/*\s*|\s*\/*\s*$/gm, ''),
+        author: author ? stripTags(author).trim() : 'Anonymous',
+        message: message.trim(),
+        target: target.replace(/[^a-zA-Z0-9/_-]/, '').replace(/^\s*\/*\s*|\s*\/*\s*$/gm, ''),
         accept_token: nanoid(),
         is_accepted: false,
         added_at: new Date().toISOString(),
@@ -34,10 +37,13 @@ async function putComment(request, h) {
             console.error(e);
             return h.response({ message: 'Error while storing the comment.' }).code(500);
         });
-}
+};
 
-async function sendTokenMail(comment, service_url) {
-    // TODO: Migrate to import from `util/mail.js`.
+async function sendTokenMail(
+    comment: { id: string; author: string; target: string; message: string; accept_token: string },
+    service_url: string,
+) {
+    // TODO: Migrate to import from `util/email.ts`.
     const transporter = nodemailer.createTransport({
         host: config.email.smtp_host,
         port: config.email.smtp_port,
@@ -68,5 +74,3 @@ If you don't want to accept the comment, you don't need to do anything.`,
 
     return transporter.sendMail(mailOptions);
 }
-
-module.exports = putComment;

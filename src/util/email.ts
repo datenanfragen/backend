@@ -1,7 +1,7 @@
-const config = require('../../config.json');
-const nodemailer = require('nodemailer');
+import config from '../../config.json' with { type: 'json' };
+import nodemailer from 'nodemailer';
 
-const transporter = nodemailer.createTransport({
+export const transporter = nodemailer.createTransport({
     host: config.email.smtp_host,
     port: config.email.smtp_port,
     secure: !!config.email.smtp_secure,
@@ -10,5 +10,3 @@ const transporter = nodemailer.createTransport({
         pass: config.email.smtp_password,
     },
 });
-
-module.exports = { transporter };

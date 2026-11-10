@@ -1,9 +1,10 @@
-const config = require('../../../config.json').bbb;
-const bbb = require('../../util/bbb').bbb;
+import type { HapiHandler } from '../../util/types.ts';
+import config from '../../../config.json' with { type: 'json' };
+import { bbb } from '../../util/bbb.ts';
 
-async function createRoom(request, h) {
+export const createRoom: HapiHandler = async (request, h) => {
     const admin_token = request.state.bbb_admin_token;
-    if (admin_token !== config.admin_token) return h.redirect('/meet/admin');
+    if (admin_token !== config.bbb.admin_token) return h.redirect('/meet/admin');
 
     const {
         room_name,
@@ -13,7 +14,15 @@ async function createRoom(request, h) {
         admin_only,
         anonymous_users_can_start,
         anonymous_users_join_as_guest,
-    } = request.payload;
+    } = request.payload as {
+        room_name: string;
+        slug: string;
+        welcome_message: string;
+        additional_params: string;
+        admin_only: boolean;
+        anonymous_users_can_start: boolean;
+        anonymous_users_join_as_guest: boolean;
+    };
 
     const params = new URLSearchParams(additional_params);
     params.set('name', room_name);
@@ -35,7 +44,7 @@ async function createRoom(request, h) {
             console.error('Error while creating room:', e);
             return h.redirect(`/meet/admin?create_error=${encodeURIComponent(e.code + ' :: ' + e.message)}`);
         });
-}
+};
 
 const join_translations = {
     de: {
@@ -51,10 +60,10 @@ const join_translations = {
         admin_only: 'You cannot join this room.',
     },
 };
-async function joinRoom(request, h) {
-    const is_admin = request.state.bbb_admin_token === config.admin_token;
+export const joinRoom: HapiHandler = async (request, h) => {
+    const is_admin = request.state.bbb_admin_token === config.bbb.admin_token;
 
-    const { lang, slug } = request.params;
+    const { lang, slug } = request.params as { lang: 'de' | 'en'; slug: string };
 
     const meeting = await request.server.methods.knex('bbb').select().where({ slug }).first();
     if (!meeting) return h.view('render-text', { text: join_translations[lang].not_found }).code(404);
@@ -97,13 +106,13 @@ async function joinRoom(request, h) {
         ...(meeting.anonymous_users_join_as_guest && { guest: true }),
     });
     return h.redirect(join_url);
-}
+};
 
-async function deleteRoom(request, h) {
+export const deleteRoom: HapiHandler = async (request, h) => {
     const admin_token = request.state.bbb_admin_token;
-    if (admin_token !== config.admin_token) return h.redirect('/meet/admin');
+    if (admin_token !== config.bbb.admin_token) return h.redirect('/meet/admin');
 
-    const slug = request.payload.slug;
+    const { slug } = request.payload as { slug: string };
 
     // I would have preferred to be considerate here and also end the meeting in the BBB API, but Senfcall doesn't let
     // me (`Error: Not Implemented`). *shrug*
@@ -117,6 +126,4 @@ async function deleteRoom(request, h) {
             console.error(`Error while deleting room "${slug}":`, e);
             return h.redirect(`/meet/admin?delete_error=${encodeURIComponent(e.code + ' :: ' + e.message)}`);
         });
-}
-
-module.exports = { createRoom, joinRoom, deleteRoom };
+};

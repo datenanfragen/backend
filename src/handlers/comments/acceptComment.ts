@@ -1,4 +1,6 @@
-async function acceptComment(request, h) {
+import type { HapiHandler } from '../../util/types.ts';
+
+export const acceptComment: HapiHandler = async (request, h) => {
     return await request.server.methods
         .knex('comments')
         .where({
@@ -25,6 +27,4 @@ async function acceptComment(request, h) {
             console.error(e);
             return h.response({ message: 'Error while accepting the comment.' }).code(500);
         });
-}
-
-module.exports = acceptComment;
+};

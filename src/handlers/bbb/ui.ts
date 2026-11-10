@@ -1,9 +1,10 @@
-const config = require('../../../config.json').bbb;
-const bbb = require('../../util/bbb').bbb;
+import type { HapiHandler } from '../../util/types.ts';
+import config from '../../../config.json' with { type: 'json' };
+import { bbb } from '../../util/bbb.ts';
 
-async function adminUi(request, h) {
+export const adminUi: HapiHandler = async (request, h) => {
     const admin_token = request.state.bbb_admin_token;
-    if (admin_token !== config.admin_token) return h.view('bbb-admin-login.html');
+    if (admin_token !== config.bbb.admin_token) return h.view('bbb-admin-login.html');
 
     const meetings = await request.server.methods.knex('bbb').select();
     const api_meetings = await bbb('getMeetings');
@@ -18,6 +19,4 @@ async function adminUi(request, h) {
         delete_success: !!request.query.delete_success,
         delete_error: request.query.delete_error,
     });
-}
-
-module.exports = { adminUi };
+};
