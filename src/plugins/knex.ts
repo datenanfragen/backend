@@ -6,16 +6,21 @@ import knexConfig from '../../knexfile.js';
 
 declare module '@hapi/hapi' {
     interface ServerMethods {
-        knex: typeof Knex;
+        knex: ReturnType<typeof makeKnex>;
     }
 }
 
-const Knex = knex(knexConfig.development);
+const makeKnex = () => knex(knexConfig.development);
 
 const knexPlugin: Plugin<null> = {
     name: 'knex',
     register: function (server) {
-        server.method('knex', Knex);
+        server.method('knex', makeKnex());
+
+        server.ext({
+            type: 'onPostStop',
+            method: (s) => s.methods.knex.destroy(),
+        });
     },
 };
 

@@ -14,7 +14,7 @@ describe('Basic Tests', (t) => {
         server = await init();
     });
     afterEach(async () => {
-        server.stop();
+        await server.stop();
     });
 
     test('GET /', async () => {
