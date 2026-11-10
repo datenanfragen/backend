@@ -1,3 +1,3 @@
-import { init, start } from './server.ts';
+import { start } from './server.ts';
 
-init().then(() => start());
+start();
